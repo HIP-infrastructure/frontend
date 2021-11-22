@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+      target: base
+    working_dir: /base
+    restart: always
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - REMOTE_APP_API=${REMOTE_APP_API}
+      - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
+      - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
+      - COLLAB_WEBDAV_URL=${COLLAB_WEBDAV_URL}
+      - COLLAB_WEBDAV_USERNAME=${COLLAB_WEBDAV_USERNAME}
+      - COLLAB_WEBDAV_PASSWORD=${COLLAB_WEBDAV_PASSWORD}
+      - HOSTNAME=${HOSTNAME}
+      - HIP_ADMIN=${HIP_ADMIN}
+    volumes:
+      - ./gateway:/base
+      - /base/node_modules
+    expose:
+      - 4000
+    networks:
+      - nextcloud-docker_frontend
+    command: npm run start:dev
+
+  web:
+    build: 
+      context: /mnt/nextcloud-dp/nextcloud/apps/hip 
+      target: base
+    working_dir: /base
+    restart: always
+    volumes:
+      - /mnt/nextcloud-dp/nextcloud/apps/hip:/base
+      # - /base/node_modules
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - HOSTNAME=${HOSTNAME}
+      - GATEWAY_API=${GATEWAY_API}
+      - GATEWAY_API_PREFIX=${GATEWAY_API_PREFIX}
+    expose:
+      - 3000
+    command: npm run start
+    networks:
+      - nextcloud-docker_frontend
+
+  cache:
+    image: redis:latest
+    command: redis-server --appendonly yes
+    restart: always
+    volumes:
+      - ./gateway/redis/data:/data
+    expose: 
+     - 6379
+    networks:
+      - nextcloud-docker_frontend
+
+networks:
+  nextcloud-docker_frontend:
+    external: true
+
+

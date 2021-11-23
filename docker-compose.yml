@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   gateway:
-    image: registry.hbp.link/hip/gateway:0.0.1
+    image: registry.hbp.link/hip/gateway:latest
     environment:
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
@@ -14,8 +14,8 @@ services:
     expose:
       - 4000
     networks:
-      - frontend
-      - backend
+      - nextcloud-docker_frontend
+      - nextcloud-docker_backend
     command: npm run start
 
   cache:
@@ -30,6 +30,8 @@ services:
       - nextcloud-docker_frontend
 
 networks:
+  nextcloud-docker_backend:
+    external: true
   nextcloud-docker_frontend:
     external: true
 

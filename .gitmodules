@@ -7,3 +7,6 @@
 [submodule "nextcloud-docker"]
 	path = nextcloud-docker
 	url = git@github.com:HIP-infrastructure/nextcloud-docker
+[submodule "bids-converter"]
+	path = bids-converter
+	url = git@github.com:HIP-infrastructure/bids-converter.git

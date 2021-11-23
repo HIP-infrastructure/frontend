@@ -1,9 +1,9 @@
 [submodule "hip"]
 	path = hip
-	url = https://github.com/HIP-infrastructure/hip
+	url = git@github.com:HIP-infrastructure/hip
 [submodule "gateway"]
 	path = gateway
-	url = https://github.com/HIP-infrastructure/gateway
+	url = git@github.com:HIP-infrastructure/gateway
 [submodule "nextcloud-docker"]
 	path = nextcloud-docker
-	url = https://github.com/HIP-infrastructure/nextcloud-docker
+	url = git@github.com:HIP-infrastructure/nextcloud-docker

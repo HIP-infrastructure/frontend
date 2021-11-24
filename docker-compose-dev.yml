@@ -51,6 +51,17 @@ services:
     networks:
       - nextcloud-docker_frontend
 
+  bids-converter:
+    build:
+      context: ./bids-converter
+    expose:
+      - 4001
+    volumes:
+      - ./bids-converter/scripts:/scripts
+      - /mnt/nextcloud-dp/nextcloud/data/:/data
+    networks:
+      - nextcloud-docker_frontend
+
 networks:
   nextcloud-docker_frontend:
     external: true

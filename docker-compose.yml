@@ -1,16 +1,12 @@
-version: "3.7"
+version: "3.2"
 
 services:
   gateway:
-    image: registry.hbp.link/hip/gateway:latest
+    image: ${GATEWAY_VERSION}
     environment:
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
       - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
-      - COLLAB_WEBDAV_URL=${COLLAB_WEBDAV_URL}
-      - COLLAB_WEBDAV_USERNAME=${COLLAB_WEBDAV_USERNAME}
-      - COLLAB_WEBDAV_PASSWORD=${COLLAB_WEBDAV_PASSWORD}
-      - HOSTNAME=${NEXTCLOUD_VIRTUAL_HOST}
     expose:
       - 4000
     networks:

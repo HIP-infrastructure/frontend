@@ -3,6 +3,7 @@ version: "3.2"
 services:
   gateway:
     image: ${GATEWAY_VERSION}
+    restart: always
     environment:
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}

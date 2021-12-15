@@ -1,10 +1,11 @@
 # HIP Frontend
 ## Meta package for NextCloud, HIP web app and gateway API
+This is the frontend install for the HIP frontend
 
 Includes 
-- Nextcloud
-- Nextcloud cron instance, with file watcher
-- 
+- Nextcloud install [nextcloud-docker](https://github.com/HIP-infrastructure/nextcloud-docker)
+- Nextcloud HIP app [hip](https://github.com/HIP-infrastructure/hip)
+- HIP Gateway [gateway](https://github.com/HIP-infrastructure/gateway)
 ## Deploy
 
 To install the frontend

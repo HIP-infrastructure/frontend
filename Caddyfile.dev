@@ -1,0 +1,65 @@
+https://hip.local
+
+encode gzip zstd
+
+#tls /etc/caddy/cert.pem /etc/caddy/key.pem
+
+log {
+	output file     /var/log/nextcloud.log
+	format single_field common_log
+	level DEBUG
+}
+
+handle /broker/* {
+	reverse_proxy rabbitmq:15672
+}
+
+# hip nextcloud app, dev proxy to frontend
+handle /apps/hip/static/* {
+	reverse_proxy web:3000
+}
+
+handle /apps/hip/css/* {
+	reverse_proxy web:3000
+}
+
+handle /sockjs-node/* {
+	header Connection *Upgrade*
+	header Upgrade websocket
+	reverse_proxy web:3000
+}
+
+handle /api/v1/* {
+	reverse_proxy gateway:4000
+}
+
+# global nextcloud config
+root * /var/www/html
+file_server
+php_fastcgi /* app:9000
+
+header {
+        # enable HSTS
+        Strict-Transport-Security max-age=31536000;
+}
+
+redir /.well-known/carddav /remote.php/dav 301
+redir /.well-known/caldav /remote.php/dav 301
+
+
+# .htaccess / data / config / ... shouldn't be accessible from outside
+@forbidden {
+	path    /.htaccess
+	path    /data/*
+	path    /config/*
+	path    /db_structure
+	path    /.xml
+	path    /README
+	path    /3rdparty/*
+	path    /lib/*
+	path    /templates/*
+	path    /occ
+	path    /console.php
+}
+
+respond @forbidden 404

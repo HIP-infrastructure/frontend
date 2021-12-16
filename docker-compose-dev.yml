@@ -8,15 +8,10 @@ services:
     working_dir: /base
     restart: always
     environment:
-      - NODE_ENV=${NODE_ENV}
+      - NODE_ENV=development
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
       - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
-      - COLLAB_WEBDAV_URL=${COLLAB_WEBDAV_URL}
-      - COLLAB_WEBDAV_USERNAME=${COLLAB_WEBDAV_USERNAME}
-      - COLLAB_WEBDAV_PASSWORD=${COLLAB_WEBDAV_PASSWORD}
-      - HOSTNAME=${HOSTNAME}
-      - HIP_ADMIN=${HIP_ADMIN}
     volumes:
       - ./gateway:/base
       - /base/node_modules
@@ -28,18 +23,17 @@ services:
 
   web:
     build: 
-      context: /mnt/nextcloud-dp/nextcloud/apps/hip 
+      context: ./hip 
       target: base
     working_dir: /base
     restart: always
     volumes:
-      - /mnt/nextcloud-dp/nextcloud/apps/hip:/base
-      # - /base/node_modules
+      - ./hip:/base
+      - /base/node_modules
     environment:
-      - NODE_ENV=${NODE_ENV}
+      - NODE_ENV=development
       - HOSTNAME=${HOSTNAME}
       - GATEWAY_API=${GATEWAY_API}
-      - GATEWAY_API_PREFIX=${GATEWAY_API_PREFIX}
     expose:
       - 3000
     command: npm run start
@@ -54,17 +48,6 @@ services:
       - ./gateway/redis/data:/data
     expose: 
      - 6379
-    networks:
-      - nextcloud-docker_frontend
-
-  bids-converter:
-    build:
-      context: ./bids-converter
-    expose:
-      - 4001
-    volumes:
-      - ./bids-converter/scripts:/scripts
-      - /mnt/nextcloud-dp/nextcloud/data/:/data
     networks:
       - nextcloud-docker_frontend
 

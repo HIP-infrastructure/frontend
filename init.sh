@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # start both gateway & cache && Nextcloud 

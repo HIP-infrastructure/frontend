@@ -14,10 +14,9 @@ sudo chown -R www-data:root $NC_HIP_APP_FOLDER
 
 # start both gateway & cache && Nextcloud 
 docker-compose \
-    -f ./nextcloud-docker/docker-compose.yml \
-    -f ./docker-compose-dev.yml \
-    up -d
+    -f nextcloud-docker/docker-compose.yml \
+    $@
 
-# copy bundled app into nextcloud app folder
-sudo cp -rf ./hip /mnt/nextcloud-dp/nextcloud/apps
-sudo chown -R www-data:root /mnt/nextcloud-dp/nextcloud/apps/hip
+docker-compose \
+    -f docker-compose-dev.yml \
+    $@

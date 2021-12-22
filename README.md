@@ -20,6 +20,13 @@ To install the frontend
 ```
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
 - Run the `./init.sh`, wait for the db to be installed then `^C`
+- Nextcloud:
+    - Start from scratch by configuring Nextcloud correctly 
+    - Or
+    - Copy the installation files from a previous installation. 
+      - `php-settings` to `/mnt/nextcloud-dp/`
+      - `nextcloud` to `/mnt/nextcould-dp`
+- sudo chown -R www-data:root /mnt/nextcloud-dp/
 - Launch `./start.sh`
 - Open your browser to your ip or hostname
 

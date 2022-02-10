@@ -7,6 +7,8 @@ git checkout master
 cd ..
 
 # start both gateway & cache && Nextcloud 
+docker network create nextcloud-docker_frontend
+
 docker-compose \
     -f ./nextcloud-docker/docker-compose.yml \
     -f ./docker-compose.yml \

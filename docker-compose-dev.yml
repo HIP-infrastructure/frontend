@@ -11,7 +11,7 @@ services:
       - NODE_ENV=development
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
-      - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
+      - NEXTCLOUD_URL=${PRIVATE_WEBDAV_URL}
     volumes:
       - ./gateway:/base
       - /base/node_modules
@@ -48,17 +48,6 @@ services:
       - ./gateway/redis/data:/data
     expose: 
      - 6379
-    networks:
-      - nextcloud-docker_frontend
-
-  bids-converter:
-    build:
-      context: ./bids-converter
-    expose:
-      - 4001
-    volumes:
-      - ./bids-converter/scripts:/scripts
-      - /mnt/nextcloud-dp/nextcloud/data/:/data
     networks:
       - nextcloud-docker_frontend
 

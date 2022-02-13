@@ -15,8 +15,8 @@ sudo chown -R www-data:root $NC_HIP_APP_FOLDER
 # start both gateway & cache && Nextcloud 
 docker-compose \
     -f nextcloud-docker/docker-compose.yml \
-    $@
+    up -d
 
 docker-compose \
     -f docker-compose-dev.yml \
-    $@
+    up -d

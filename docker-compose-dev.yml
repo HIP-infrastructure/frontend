@@ -11,7 +11,7 @@ services:
       - NODE_ENV=development
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
-      - NEXTCLOUD_URL=${PRIVATE_WEBDAV_URL}
+      - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
     volumes:
       - ./gateway:/base
       - /base/node_modules

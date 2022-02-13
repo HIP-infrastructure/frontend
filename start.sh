@@ -11,8 +11,8 @@ cd ..
 # start both gateway & cache && Nextcloud 
 docker network create nextcloud-docker_frontend
 
-echo "Copy Caddyfile to ./nextcloud-docker/caddy/Caddyfile"
-cp Caddyfile ./nextcloud-docker/caddy/Caddyfile
+# echo "Copy Caddyfile to ./nextcloud-docker/caddy/Caddyfile"
+# cp Caddyfile ./nextcloud-docker/caddy/Caddyfile
 
 docker-compose \
     -f ./nextcloud-docker/docker-compose.yml \

@@ -16,6 +16,7 @@ docker network create nextcloud-docker_frontend
 
 docker-compose \
     -f ./nextcloud-docker/docker-compose.yml \
+    --env-file ./.env \
     up -d
 
 docker-compose \

@@ -12,6 +12,7 @@ services:
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
       - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
+      - HIP_ADMIN=${HIP_ADMIN}
     volumes:
       - ./gateway:/base
       - /base/node_modules

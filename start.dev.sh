@@ -6,6 +6,7 @@ echo "Copy Caddyfile.dev to ./nextcloud-docker/caddy/Caddyfile"
 cp Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
 
 # copy bootstrap files into nextcloud app folder
+sudo mkdir -p $NC_APP_FOLDER/hip
 sudo cp -r ./hip $NC_APP_FOLDER/
 sudo cp -rf ./hip/appinfo $NC_APP_FOLDER/hip
 sudo cp -rf ./hip/lib $NC_APP_FOLDER/hip
@@ -20,4 +21,5 @@ docker-compose \
 
 docker-compose \
     -f docker-compose-dev.yml \
+    --env-file ./.env \
     up -d

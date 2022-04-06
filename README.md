@@ -6,10 +6,13 @@ Includes
 - Nextcloud install [nextcloud-docker](https://github.com/HIP-infrastructure/nextcloud-docker)
 - Nextcloud HIP app [hip](https://github.com/HIP-infrastructure/hip)
 - HIP Gateway [gateway](https://github.com/HIP-infrastructure/gateway)
-## Deploy
+## Deploy, production
+
+### Prerequisite
+- Make sure you have [docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04) and docker-compose installed
+
 To install the frontend
 - Clone this repository
-- Make sure you have [docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04) and docker-compose installed
 - Login to the HIP registry `docker login registry.hbp.link`
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
 - Add the following line to the nextcloud-docker/caddy/Caddyfile 
@@ -32,8 +35,11 @@ To install the frontend
 
 ## Dev
 To install the frontend
+- `checkout dev`
 - Login to the HIP registry `docker login registry.hbp.link`
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
-- Run the `./init.sh`, wait for the db to be installed then `^C`
-- Launch `./start-dev.sh up -d`
+- Change the hostname in Caddyfile.dev to your hostname
+- Run the `./init.dev.sh`, wait for the db to be installed then `^C`
+- copy `php-settings` folder to `/mnt/nextcloud-dp/php-settings`
+- Launch `./start.dev.sh`

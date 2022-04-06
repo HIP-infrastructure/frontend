@@ -10,10 +10,11 @@ Includes
 
 ### Prerequisite
 - Make sure you have [docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04) and docker-compose installed
+- Login to the HIP registry `docker login registry.hbp.link`
+
 
 To install the frontend
 - Clone this repository
-- Login to the HIP registry `docker login registry.hbp.link`
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
 - Add the following line to the nextcloud-docker/caddy/Caddyfile 
 ```
@@ -34,12 +35,26 @@ To install the frontend
 - Open your browser to your ip or hostname
 
 ## Dev
-To install the frontend
+To install the frontend in development mode
 - `checkout dev`
-- Login to the HIP registry `docker login registry.hbp.link`
+- `cd hip && checkout dev && cd ..`
+- `cd gateway && checkout dev && cd ..`
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
 - Change the hostname in Caddyfile.dev to your hostname
 - Run the `./init.dev.sh`, wait for the db to be installed then `^C`
-- copy `php-settings` folder to `/mnt/nextcloud-dp/php-settings`
 - Launch `./start.dev.sh`
+- wait a bit
+- Launch `./stop.dev.sh`
+- `sudo rm -rf /mnt/nextcloud-dp/php-settings`
+- `sudo cp -r  php-settings /mnt/nextcloud-dp`
+- Launch `./start.dev.sh`
+- Point you browser to your ${HOSTNAME}
+- Login with the nextcloud-docker/secrets/ user & password
+- Go in apps -> disabled apps -> enable untested app -> HIP
+
+
+Side note, reinstall dev
+./down.dev.sh
+sudo rm -rf nextcloud-docker/caddy/caddy_data/ nextcloud-docker/db
+sudo rm -rf /mnt/nexcloud-dp

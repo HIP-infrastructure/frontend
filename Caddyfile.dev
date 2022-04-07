@@ -1,4 +1,4 @@
-https://hip.local
+https://hip.collab.local
 
 encode gzip zstd
 
@@ -10,23 +10,19 @@ log {
 	level DEBUG
 }
 
-handle /broker/* {
-	reverse_proxy rabbitmq:15672
-}
-
 # hip nextcloud app, dev proxy to frontend
 handle /apps/hip/static/* {
-	reverse_proxy web:3000
+	reverse_proxy hip:3000
 }
 
 handle /apps/hip/css/* {
-	reverse_proxy web:3000
+	reverse_proxy hip:3000
 }
 
 handle /sockjs-node/* {
 	header Connection *Upgrade*
 	header Upgrade websocket
-	reverse_proxy web:3000
+	reverse_proxy hip:3000
 }
 
 handle /api/v1/* {

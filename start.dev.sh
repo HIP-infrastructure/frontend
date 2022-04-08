@@ -2,9 +2,6 @@
 
 NC_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/apps
 
-echo "Copy Caddyfile.dev to ./nextcloud-docker/caddy/Caddyfile"
-cp Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
-
 # copy bootstrap files into nextcloud app folder
 sudo mkdir -p $NC_APP_FOLDER/hip
 sudo cp -r ./hip $NC_APP_FOLDER/

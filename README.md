@@ -47,6 +47,7 @@ To install the frontend in development mode
 - add your ${HOSTNAME} to `/etc/hosts`, like `127.0.0.1 hip.local`
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
 - Change the hostname in Caddyfile.dev to your ${HOSTNAME}
+- cp Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
 - Run the `./init.sh`, wait for the db to be installed then `^C`
 - Run `./start.dev.sh`, this starts the Nextcloud stack, the frontend and the gateway
 - Wait a bit
@@ -58,7 +59,7 @@ To install the frontend in development mode
 - Add some params to the Nextcloud php config
     'htaccess.RewriteBase' => '/',
     'htaccess.IgnoreFrontController' => true, 
-    in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
+    on top of the array in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
 - Point you browser to your ${HOSTNAME}
 - Login with the nextcloud-docker/secrets/ user & password
 - Go in apps -> disabled apps -> enable untested app -> HIP

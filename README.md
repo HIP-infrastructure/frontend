@@ -24,37 +24,47 @@ To install the frontend
 ```
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
 - Run the `./init.sh`, wait for the db to be installed then `^C`
-- Nextcloud:
-    - Start from scratch by configuring Nextcloud correctly 
-    - Or
-    - Copy the installation files from a previous installation. 
-      - `php-settings` to `/mnt/nextcloud-dp/`
-      - `nextcloud` to `/mnt/nextcould-dp`
-- sudo chown -R www-data:root /mnt/nextcloud-dp/
-- Launch `./start.sh`
+- Run `./start.sh`, this starts the Nextcloud stack, the frontend and the gateway
+- Wait a bit
+- Run `./stop.sh`
+- Once Nextcloud is installed, we need to replace the created php-settings by our own in order to parametrize it for docker etc.
+  - `sudo rm -rf /mnt/nextcloud-dp/php-settings`
+  - `sudo cp -r php-settings /mnt/nextcloud-dp`
+- Re run `./start.sh`
+- Add some params to the Nextcloud php config
+    'htaccess.RewriteBase' => '/',
+    'htaccess.IgnoreFrontController' => true, 
+    in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
 - Open your browser to your ip or hostname
 
 ## Dev
 To install the frontend in development mode
-- `checkout dev`
-- `cd hip && checkout dev && cd ..`
-- `cd gateway && checkout dev && cd ..`
-- Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
+- Clone this repo, 
+- `cd frontend`
+- `git checkout dev`
+- `git submodule update --recursive --init`
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
-- Change the hostname in Caddyfile.dev to your hostname
-- Run the `./init.dev.sh`, wait for the db to be installed then `^C`
-- Launch `./start.dev.sh`
-- wait a bit
-- Launch `./stop.dev.sh`
-- `sudo rm -rf /mnt/nextcloud-dp/php-settings`
-- `sudo cp -r  php-settings /mnt/nextcloud-dp`
-- Launch `./start.dev.sh`
+- add your ${HOSTNAME} to `/etc/hosts`, like `127.0.0.1 hip.local`
+- Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
+- Change the hostname in Caddyfile.dev to your ${HOSTNAME}
+- Run the `./init.sh`, wait for the db to be installed then `^C`
+- Run `./start.dev.sh`, this starts the Nextcloud stack, the frontend and the gateway
+- Wait a bit
+- Run `./stop.dev.sh`
+- Once Nextcloud is installed, we need to replace the created php-settings by our own in order to parametrize it for docker etc.
+  - `sudo rm -rf /mnt/nextcloud-dp/php-settings`
+  - `sudo cp -r php-settings /mnt/nextcloud-dp`
+- Re run `./start.dev.sh`
+- Add some params to the Nextcloud php config
+    'htaccess.RewriteBase' => '/',
+    'htaccess.IgnoreFrontController' => true, 
+    in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
 - Point you browser to your ${HOSTNAME}
 - Login with the nextcloud-docker/secrets/ user & password
 - Go in apps -> disabled apps -> enable untested app -> HIP
 
 
 Side note, reinstall dev
-./down.dev.sh
-sudo rm -rf nextcloud-docker/caddy/caddy_data/ nextcloud-docker/db
-sudo rm -rf /mnt/nexcloud-dp
+./down.dev.sh  
+sudo rm -rf nextcloud-docker/caddy/caddy_data/ nextcloud-docker/db  
+sudo rm -rf /mnt/nexcloud-dp  

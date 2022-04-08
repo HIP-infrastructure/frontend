@@ -4,8 +4,8 @@
 docker-compose \
     -f nextcloud-docker/docker-compose.yml \
     --env-file ./.env \
-    down
+    down --remove-orphans
 
 docker-compose \
     -f docker-compose-dev.yml \
-    down
+    down --remove-orphans

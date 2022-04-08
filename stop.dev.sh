@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# start both gateway & cache && Nextcloud 
+# stop both gateway & cache && Nextcloud 
 docker-compose \
     -f nextcloud-docker/docker-compose.yml \
+    --env-file ./.env \
     stop
 
 docker-compose \

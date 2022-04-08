@@ -22,7 +22,7 @@ services:
       - nextcloud-docker_frontend
     command: npm run start:dev
 
-  web:
+  hip:
     build: 
       context: ./hip 
       target: base

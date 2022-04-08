@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# start both gateway & cache && Nextcloud 
+# tear down both gateway & cache && Nextcloud 
 docker-compose \
     -f nextcloud-docker/docker-compose.yml \
-    down
+    --env-file ./.env \
+    down --remove-orphans
 
 docker-compose \
     -f docker-compose-dev.yml \
-    down
+    down --remove-orphans

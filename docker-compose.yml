@@ -1,21 +1,6 @@
 version: "3.2"
 
 services:
-  gateway:
-    image: ${GATEWAY_VERSION}
-    restart: always
-    environment:
-      - REMOTE_APP_API=${REMOTE_APP_API}
-      - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
-      - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
-      - HIP_ADMIN=${HIP_ADMIN}
-    expose:
-      - 4000
-    networks:
-      - nextcloud-docker_frontend
-      - nextcloud-docker_backend
-    command: npm run start
-
   cache:
     image: redis:latest
     command: redis-server --appendonly yes
@@ -24,6 +9,8 @@ services:
       - ./gateway/redis/data:/data
     expose: 
      - 6379
+    ports:
+      - 127.0.0.1:6379:6379
     networks:
       - nextcloud-docker_frontend
 

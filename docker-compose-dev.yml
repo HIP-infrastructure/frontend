@@ -14,6 +14,8 @@ services:
       - NODE_ENV=development
       - HOSTNAME=${HOSTNAME}
       - GATEWAY_API=${GATEWAY_API}
+      - MATOMO_URL_BASE=${MATOMO_URL_BASE}
+      - MATOMO_SITE_ID=${MATOMO_SITE_ID}
     expose:
       - 3000
     command: npm run start

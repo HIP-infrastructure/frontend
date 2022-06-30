@@ -1,4 +1,4 @@
-https://hip.collab.local
+https://{$HOSTNAME}
 
 encode gzip zstd
 
@@ -26,7 +26,7 @@ handle /sockjs-node/* {
 }
 
 handle /api/v1/* {
-	reverse_proxy gateway:4000
+	reverse_proxy {$GATEWAY_REVERSE_PROXY}
 }
 
 # global nextcloud config

@@ -12,15 +12,18 @@ dep.init:
 build: b.hipapp b.gateway
 
 b.hipapp:
-	cd hip && git checkout master && cd ..
+	# cd hip && git checkout master && cd ..
 	make -C hip build
+
+b.socialapp:
+	make -C nextcloud-social-login build
 
 b.gateway:
 	#cd gateway && git checkout master && cd ..
 	sudo make -C gateway build
 
 #deploy: @ Deploy the frontend stack in production mode
-deploy: build d.nextcloud d.hipapp d.gateway d.reddis 
+deploy: build d.nextcloud d.hipapp d.socialapp d.gateway d.reddis 
 
 d.nextcloud:
 	cp ./settings/Caddyfile ./nextcloud-docker/caddy/Caddyfile
@@ -34,6 +37,11 @@ d.hipapp:
 	sudo mkdir /mnt/nextcloud-dp/nextcloud/apps/hip
 	sudo tar -zxvf hip/release.tar.gz -C /mnt/nextcloud-dp/nextcloud/apps/hip
 	sudo chown -R www-data:root $(NC_APP_FOLDER)
+
+d.socialapp:
+	sudo rm -rf $(SOCIAL_APP_FOLDER)
+	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
+	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
 
 d.gateway:
 	make -C gateway deploy
@@ -57,7 +65,7 @@ deploy.stop:
 	make -C gateway deploy.stop
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: d.nextcloud.dev d.hipapp.dev d.bidsimporter.dev d.gateway.dev
+deploy.dev: d.nextcloud.dev d.hipapp.dev d.socialapp.dev d.bidsimporter.dev d.gateway.dev
 
 d.nextcloud.dev:
 	cp ./settings/Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
@@ -67,6 +75,10 @@ d.nextcloud.dev:
 		up -d
 
 d.socialapp.dev:
+	make -C nextcloud-social-login build
+	sudo rm -rf $(SOCIAL_APP_FOLDER)
+	sudo cp ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
+	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
 
 d.hipapp.dev:
 	sudo mkdir -p $(NC_APP_FOLDER)/hip
@@ -84,7 +96,7 @@ d.bidsimporter.dev:
 	cd bids-converter
 
 d.gateway.dev:
-	cd gateway && sudo -u www-data -E npm run start:dev
+	make -C gateway deploy.dev
 
 #deploy.dev.stop: @ Stop the frontend stack in dev mode
 deploy.dev.stop: 

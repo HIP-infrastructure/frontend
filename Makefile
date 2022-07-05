@@ -3,15 +3,24 @@
 include .env
 export
 
+#dep.init: @ Install all depencies for Ubuntu
+dep.init:
+	git submodule update --init --recursive
+	make -C gateway dep.init
+
 #build : @ Build components locally
-build.prod: b.hipapp
+build: b.hipapp b.gateway
 
 b.hipapp:
 	cd hip && git checkout master && cd ..
 	make -C hip build
 
-#deploy.prod: @ Deploy the frontend stack in production mode
-deploy.prod: build.prod d.nextcloud d.hipapp d.reddis d.gateway
+b.gateway:
+	#cd gateway && git checkout master && cd ..
+	sudo make -C gateway build
+
+#deploy: @ Deploy the frontend stack in production mode
+deploy: build d.nextcloud d.hipapp d.gateway d.reddis 
 
 d.nextcloud:
 	cp ./settings/Caddyfile ./nextcloud-docker/caddy/Caddyfile
@@ -27,7 +36,7 @@ d.hipapp:
 	sudo chown -R www-data:root $(NC_APP_FOLDER)
 
 d.gateway:
-	cd gateway && sudo -u www-data -E npm run start:dev
+	make -C gateway deploy
 
 d.reddis:
 	docker-compose \
@@ -35,8 +44,8 @@ d.reddis:
 		--env-file ./.env \
 		up -d
 
-#deploy.prod.stop: @ Stop the frontend stack in production mode
-deploy.prod.stop: 
+#deploy.stop: @ Stop the frontend stack in production mode
+deploy.stop: 
 	docker-compose \
 		-f nextcloud-docker/docker-compose.yml \
 		--env-file ./.env \
@@ -45,9 +54,10 @@ deploy.prod.stop:
 		-f ./docker-compose.yml \
 		--env-file ./.env \
 		stop
+	make -C gateway deploy.stop
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: d.nextcloud.dev d.hipapp.dev d.gateway.dev
+deploy.dev: d.nextcloud.dev d.hipapp.dev d.bidsimporter.dev d.gateway.dev
 
 d.nextcloud.dev:
 	cp ./settings/Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
@@ -71,6 +81,7 @@ d.hipapp.dev:
 		up -d
 
 d.bidsimporter.dev:
+	cd bids-converter
 
 d.gateway.dev:
 	cd gateway && sudo -u www-data -E npm run start:dev

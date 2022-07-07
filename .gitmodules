@@ -8,9 +8,10 @@
 	path = nextcloud-docker
 	url = git@github.com:HIP-infrastructure/nextcloud-docker
 [submodule "bids-converter"]
-	path = bids-converter
+	path = bids-tools
 	url = git@github.com:HIP-infrastructure/bids-converter.git
 [submodule "nextcloud-social-login"]
 	path = nextcloud-social-login
 	url = https://github.com/HIP-infrastructure/nextcloud-social-login
 	branch = feat/oidc-username-claim
+

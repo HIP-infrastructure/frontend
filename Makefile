@@ -9,7 +9,7 @@ dep.init:
 	make -C gateway dep.init
 
 #build : @ Build components locally
-build: b.hipapp b.gateway
+build: b.hipapp b.socialapp b.gateway b.bids-tools
 
 b.hipapp:
 	# cd hip && git checkout master && cd ..
@@ -21,6 +21,9 @@ b.socialapp:
 b.gateway:
 	#cd gateway && git checkout master && cd ..
 	sudo make -C gateway build
+
+b.bids-tools:
+	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack in production mode
 deploy: build d.nextcloud d.hipapp d.socialapp d.gateway d.reddis 
@@ -65,7 +68,7 @@ deploy.stop:
 	make -C gateway deploy.stop
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: d.nextcloud.dev d.hipapp.dev d.socialapp.dev d.bidsimporter.dev d.gateway.dev
+deploy.dev: d.nextcloud.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
 d.nextcloud.dev:
 	cp ./settings/Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
@@ -73,12 +76,6 @@ d.nextcloud.dev:
 		-f nextcloud-docker/docker-compose.yml \
 		--env-file ./.env \
 		up -d
-
-d.socialapp.dev:
-	make -C nextcloud-social-login build
-	sudo rm -rf $(SOCIAL_APP_FOLDER)
-	sudo cp ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
-	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
 
 d.hipapp.dev:
 	sudo mkdir -p $(NC_APP_FOLDER)/hip
@@ -92,8 +89,14 @@ d.hipapp.dev:
 		--env-file ./.env \
 		up -d
 
-d.bidsimporter.dev:
-	cd bids-converter
+d.socialapp.dev:
+	make -C nextcloud-social-login build
+	sudo rm -rf $(SOCIAL_APP_FOLDER)
+	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
+	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
+
+d.bids-tools.dev:
+	make -C bids-tools build
 
 d.gateway.dev:
 	make -C gateway deploy.dev

@@ -110,6 +110,7 @@ deploy.dev.stop:
 	docker-compose \
     -f docker-compose-dev.yml \
     stop
+	make -C gateway deploy.dev.stop
 
 #help:	@ List available tasks on this project
 help:

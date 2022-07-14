@@ -9,10 +9,10 @@ dep.init:
 	make -C gateway dep.init
 
 #build : @ Build components locally
-build: b.nectcloud b.hipapp b.socialapp b.gateway b.bids-tools
+build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
 
 b.nextcloud:
-docker-compose \
+	docker-compose \
 		-f nextcloud-docker/docker-compose.yml \
 		--env-file ./.env \
 		build app

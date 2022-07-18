@@ -88,7 +88,7 @@ d.nextcloud.dev:
 		up -d
 
 d.hipapp.dev:
-	sudo mkdir -p $(NC_APP_FOLDER)/hip
+	sudo mkdir -p $(NC_APP_FOLDER)/hip/templates
 	sudo cp -rf ./hip/appinfo $(NC_APP_FOLDER)/hip
 	sudo cp -rf ./hip/lib $(NC_APP_FOLDER)/hip
 	sudo cp -rf ./hip/img $(NC_APP_FOLDER)/hip

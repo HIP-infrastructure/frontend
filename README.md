@@ -19,15 +19,14 @@ As the package will migrate to K8s, everything is build on the host
 ## Deploy, production
 - Clone this repo, 
 - `cd frontend`
-- `git checkout dev`
+- `git checkout master`
 - `git submodule update --recursive --init`
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
 
-`make dep.init` the first time
+ the first time `make dep.init`  
 `make deploy `
 
-The first time, you have to install Nextcloud. 
-
+The first time, you have also to install Nextcloud. 
 
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
 - Run the `./init.sh`, wait for the db to be installed then `^C`
@@ -35,11 +34,12 @@ The first time, you have to install Nextcloud.
   - `make deploy.stop`
   - `sudo rm -rf /mnt/nextcloud-dp/php-settings`
   - `sudo cp -r php-settings /mnt/nextcloud-dp`
-- Add some params to the Nextcloud php config
-    'htaccess.RewriteBase' => '/',
-    'htaccess.IgnoreFrontController' => true, 
-    'defaultapp' => 'hip'
-    in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
+- Add some params to the Nextcloud php config in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
+    ```
+    'htaccess.RewriteBase' => '/',    
+    'htaccess.IgnoreFrontController' => true,     
+    'defaultapp' => 'hip'  
+    ```  
 - `make deploy`
 - Open your browser to your ip or hostname
 - Go in apps -> disabled apps -> enable untested app -> HIP

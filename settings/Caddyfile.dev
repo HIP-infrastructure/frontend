@@ -6,7 +6,6 @@ encode gzip zstd
 
 log {
 	output file     /var/log/nextcloud.log
-	format single_field common_log
 	level DEBUG
 }
 

@@ -9,9 +9,12 @@ services:
     restart: always
     environment:
       - NODE_ENV=development
+      - HOSTNAME=${HOSTNAME}
+      - HOSTNAME_SCHEME=${HOSTNAME_SCHEME}
       - REMOTE_APP_API=${REMOTE_APP_API}
       - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
-      - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
+      - PRIVATE_FS_URL=${PRIVATE_FS_URL}
+      - PRIVATE_FS_AUTH_BACKEND_URL=${PRIVATE_FS_AUTH_BACKEND_URL}
       - HIP_ADMIN=${HIP_ADMIN}
     volumes:
       - ./gateway:/base

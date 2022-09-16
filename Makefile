@@ -80,6 +80,10 @@ deploy.stop:
 #deploy.dev: @ Deploy the frontend stack in dev mode
 deploy.dev: d.nextcloud.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
+deploy.dev.gateway: 
+	make -C gateway deploy.dev.stop
+	make -C gateway deploy.dev
+
 d.nextcloud.dev:
 	cp ./settings/Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
 	docker-compose \

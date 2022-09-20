@@ -7,48 +7,40 @@ export
 dep.init:
 	git submodule update --init --recursive
 	make -C gateway dep.init
+	# install ghostfs
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
 
 b.nextcloud:
-	docker-compose \
-		-f nextcloud-docker/docker-compose.yml \
-		--env-file ./.env \
-		build app
-	docker-compose \
-		-f nextcloud-docker/docker-compose.yml \
-		--env-file ./.env \
-		build cron
+	docker-compose --env-file ./.env build app
+	docker-compose --env-file ./.env build cron
 
 b.hipapp:
-	# cd hip && git checkout master && cd ..
 	make -C hip build
 
 b.socialapp:
 	make -C nextcloud-social-login build
 
 b.gateway:
-	#cd gateway && git checkout master && cd ..
 	sudo make -C gateway build
 
 b.bids-tools:
 	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack in production mode
-deploy: build d.nextcloud d.hipapp d.socialapp d.gateway d.reddis 
+deploy: build d.nextcloud d.pm2 d.nextcloud d.hipapp d.socialapp 
 
 d.nextcloud:
-	cp ./settings/Caddyfile ./nextcloud-docker/caddy/Caddyfile
-	docker-compose \
-		-f nextcloud-docker/docker-compose.yml \
-		--env-file ./.env \
-		up -d
+	docker-compose --env-file ./.env up -d
+
+d.pm2:
+	sudo pm2 start pm2/ecosystem.config.js
 
 d.hipapp:
-	sudo rm -rf /mnt/nextcloud-dp/nextcloud/apps/hip
-	sudo mkdir /mnt/nextcloud-dp/nextcloud/apps/hip
-	sudo tar -zxvf hip/release.tar.gz -C /mnt/nextcloud-dp/nextcloud/apps/hip
+	sudo rm -rf $(NC_APP_FOLDER)/hip
+	sudo mkdir $(NC_APP_FOLDER)/hip
+	sudo tar -zxvf hip/release.tar.gz -C $(NC_APP_FOLDER)/hip
 	sudo chown -R www-data:root $(NC_APP_FOLDER)
 
 d.socialapp:
@@ -56,33 +48,17 @@ d.socialapp:
 	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
 	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
 
-d.gateway:
-	make -C gateway deploy
-
-d.reddis:
-	docker-compose \
-		-f ./docker-compose.yml \
-		--env-file ./.env \
-		up -d
-
 #deploy.stop: @ Stop the frontend stack in production mode
 deploy.stop: 
-	docker-compose \
-		-f nextcloud-docker/docker-compose.yml \
-		--env-file ./.env \
-		stop
-	docker-compose \
-		-f ./docker-compose.yml \
-		--env-file ./.env \
-		stop
-	make -C gateway deploy.stop
+	docker-compose --env-file ./.env stop
+	sudo pm2 stop pm2/ecosystem.config.js
+
+restart.dev.gateway: 
+	make -C gateway deploy.dev.stop
+	make -C gateway deploy.dev
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
 deploy.dev: d.nextcloud.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
-
-deploy.dev.gateway: 
-	make -C gateway deploy.dev.stop
-	make -C gateway deploy.dev
 
 d.nextcloud.dev:
 	cp ./settings/Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
@@ -124,7 +100,6 @@ deploy.dev.stop:
 	docker-compose \
     -f docker-compose-dev.yml \
     stop
-	make -C gateway deploy.dev.stop
 
 #help:	@ List available tasks on this project
 help:

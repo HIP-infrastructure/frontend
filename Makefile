@@ -7,7 +7,7 @@ export
 dep.init:
 	git submodule update --init --recursive
 	make -C gateway dep.init
-	# install ghostfs
+	sh ./ghostfs/install_auth_backend.sh
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
@@ -50,7 +50,7 @@ d.socialapp:
 
 #deploy.stop: @ Stop the frontend stack in production mode
 deploy.stop: 
-	docker-compose --env-file ./.env stop
+	docker-compose stop
 	sudo pm2 stop pm2/ecosystem.config.js
 
 restart.dev.gateway: 
@@ -58,14 +58,16 @@ restart.dev.gateway:
 	make -C gateway deploy.dev
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: d.nextcloud.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+deploy.dev: d.nextcloud.dev d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
 d.nextcloud.dev:
-	cp ./settings/Caddyfile.dev ./nextcloud-docker/caddy/Caddyfile
 	docker-compose \
 		-f nextcloud-docker/docker-compose.yml \
 		--env-file ./.env \
 		up -d
+
+d.pm2.dev:
+	sudo pm2 start pm2/ecosystem.dev.config.js
 
 d.hipapp.dev:
 	sudo mkdir -p $(NC_APP_FOLDER)/hip/templates
@@ -93,13 +95,9 @@ d.gateway.dev:
 
 #deploy.dev.stop: @ Stop the frontend stack in dev mode
 deploy.dev.stop: 
-	docker-compose \
-		-f nextcloud-docker/docker-compose.yml \
-		--env-file ./.env \
-		stop
-	docker-compose \
-    -f docker-compose-dev.yml \
-    stop
+	docker-compose -f docker-compose-dev.yml down
+	sudo pm2 stop pm2/ecosystem.dev.config.js
+	make -C gateway deploy.dev.stop
 
 #help:	@ List available tasks on this project
 help:

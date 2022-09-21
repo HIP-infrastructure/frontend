@@ -17,7 +17,6 @@ services:
     networks:
       - backend
 
-
   app:
     image: nextcloud:${NEXTCLOUD_VERSION}
     restart: always

@@ -5,9 +5,12 @@ export
 
 #install: @ Install all depencies for the HIP
 install:
-	#git submodule update --init --recursive
-	#make -C gateway dep.init
 	sh ./install_ghostfs.sh
+
+#update: @ Update all submodules for the HIP
+update:
+	git pull
+	git submodule update --init --recursive
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools

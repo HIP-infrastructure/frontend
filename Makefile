@@ -4,6 +4,7 @@ include .env
 export
 
 #install: @ Install all depencies for the HIP
+# TODO: SHELL:=/bin/bash
 install:
 	bash ./install_ghostfs.sh
 
@@ -11,6 +12,9 @@ install:
 update:
 	git pull
 	git submodule update --init --recursive
+	rm -f ghostfs/GhostFS
+	curl -L# https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-$GHOSTFS_VERSION/GhostFS -o ghostfs/GhostFS
+	chmod +x ghostfs/GhostFS
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
@@ -35,11 +39,12 @@ b.bids-tools:
 deploy: build d.nextcloud d.pm2 d.nextcloud d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
+	docker-compose exec --user www-data app php occ upgrade
 
 d.nextcloud:
-	[ ! -f /var/www ] && sudo mkdir -p /var/www
-	[ ! -f /var/www/html ] && sudo ln -s /mnt/nextcloud-dp/nextcloud /var/www/html
-	sudo chown www-data:www-data /var/www/html
+	sudo mkdir -p /var/www
+	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
+	sudo chown -R www-data:www-data /var/www/html
 	docker-compose --env-file ./.env up -d
 
 d.pm2:

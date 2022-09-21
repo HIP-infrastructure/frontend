@@ -3,11 +3,11 @@
 include .env
 export
 
-#dep.init: @ Install all depencies for Ubuntu
-dep.init:
-	git submodule update --init --recursive
-	make -C gateway dep.init
-	sh ./ghostfs/install_auth_backend.sh
+#install: @ Install all depencies for the HIP
+install:
+	#git submodule update --init --recursive
+	#make -C gateway dep.init
+	sh ./install_ghostfs.sh
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools

@@ -5,7 +5,7 @@ export
 
 #install: @ Install all depencies for the HIP
 install:
-	sh ./install_ghostfs.sh
+	bash ./install_ghostfs.sh
 
 #update: @ Update all submodules for the HIP
 update:
@@ -32,12 +32,18 @@ b.bids-tools:
 	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack in production mode
-deploy: build d.nextcloud d.pm2 d.nextcloud d.hipapp d.socialapp 
+deploy: build d.nextcloud d.pm2 d.nextcloud d.hipapp d.socialapp
+	sudo pm2 status
+	docker ps
 
 d.nextcloud:
+	[ ! -f /var/www ] && sudo mkdir -p /var/www
+	[ ! -f /var/www/html ] && sudo ln -s /mnt/nextcloud-dp/nextcloud /var/www/html
+	sudo chown www-data:www-data /var/www/html
 	docker-compose --env-file ./.env up -d
 
 d.pm2:
+	sudo pm2 save
 	sudo pm2 start pm2/ecosystem.config.js
 
 d.hipapp:
@@ -55,6 +61,8 @@ d.socialapp:
 deploy.stop: 
 	docker-compose stop
 	sudo pm2 stop pm2/ecosystem.config.js
+	sudo pm2 status
+	docker ps
 
 restart.dev.gateway: 
 	make -C gateway deploy.dev.stop

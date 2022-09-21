@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -o allexport; source .env; set +o allexport
 
@@ -52,7 +52,7 @@ else
     cp ghostfs/auth_backend/auth_backend.env.template ghostfs/auth_backend/auth_backend.env
 fi
 
-rm ghostfs/GhostFS
+rm -f ghostfs/GhostFS
 curl -L# https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-$GHOSTFS_VERSION/GhostFS -o ghostfs/GhostFS
 chmod +x ghostfs/GhostFS
 

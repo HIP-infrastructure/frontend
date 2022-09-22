@@ -1,30 +1,6 @@
 version: "3.7"
 
 services:
-  gateway:
-    build:
-      context: ./gateway
-      target: base
-    working_dir: /base
-    restart: always
-    environment:
-      - NODE_ENV=development
-      - HOSTNAME=${HOSTNAME}
-      - HOSTNAME_SCHEME=${HOSTNAME_SCHEME}
-      - REMOTE_APP_API=${REMOTE_APP_API}
-      - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
-      - PRIVATE_FS_URL=${PRIVATE_FS_URL}
-      - PRIVATE_FS_AUTH_BACKEND_URL=${PRIVATE_FS_AUTH_BACKEND_URL}
-      - HIP_ADMIN=${HIP_ADMIN}
-    volumes:
-      - ./gateway:/base
-      - /base/node_modules
-    expose:
-      - 4000
-    networks:
-      - nextcloud-docker_frontend
-    command: npm run start:dev
-
   hip:
     build: 
       context: ./hip 
@@ -44,21 +20,6 @@ services:
       - 3000
     command: npm run start
     networks:
-      - nextcloud-docker_frontend
+      - frontend
 
-  cache:
-    image: redis:latest
-    command: redis-server --appendonly yes
-    restart: always
-    volumes:
-      - ./gateway/redis/data:/data
-    expose: 
-      - 6379
-    ports:
-      - 127.0.0.1:6379:6379
-    networks:
-      - nextcloud-docker_frontend
-
-networks:
-  nextcloud-docker_frontend:
-    external: true
+  

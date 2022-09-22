@@ -69,16 +69,17 @@ deploy.stop:
 	sudo pm2 status
 	docker ps
 
-restart.dev.gateway: 
-	make -C gateway deploy.dev.stop
-	make -C gateway deploy.dev
-
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: d.nextcloud.dev d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+deploy.dev: b.nextcloud d.nextcloud.dev d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+	docker-compose exec --user ${DATA_USER} app php occ upgrade
 
 d.nextcloud.dev:
+	sudo mkdir -p /var/www
+	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
+	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
 	docker-compose \
-		-f nextcloud-docker/docker-compose.yml \
+		-f docker-compose.yml \
+		-f docker-compose-dev.yml \
 		--env-file ./.env \
 		up -d
 
@@ -92,10 +93,6 @@ d.hipapp.dev:
 	sudo cp -rf ./hip/img $(NC_APP_FOLDER)/hip
 	sudo cp -f ./hip/templates/index.php $(NC_APP_FOLDER)/hip/templates/index.php
 	sudo chown -R ${DATA_USER}:${DATA_USER} $(NC_APP_FOLDER)/hip
-	docker-compose \
-		-f docker-compose-dev.yml \
-		--env-file ./.env \
-		up -d
 
 d.socialapp.dev:
 	make -C nextcloud-social-login build
@@ -110,9 +107,14 @@ d.gateway.dev:
 	make -C gateway deploy.dev
 
 #deploy.dev.stop: @ Stop the frontend stack in dev mode
-deploy.dev.stop: 
-	docker-compose -f docker-compose-dev.yml down
+deploy.dev.stop: d.gateway.dev.stop
+	docker-compose \
+		-f docker-compose.yml \
+		-f docker-compose-dev.yml \
+		down
 	sudo pm2 stop pm2/ecosystem.dev.config.js
+
+d.gateway.dev.stop:
 	make -C gateway deploy.dev.stop
 
 #help:	@ List available tasks on this project

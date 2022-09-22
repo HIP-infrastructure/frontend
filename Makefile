@@ -39,12 +39,12 @@ b.bids-tools:
 deploy: build d.nextcloud d.pm2 d.nextcloud d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
-	docker-compose exec --user www-data app php occ upgrade
+	docker-compose exec --user ${DATA_USER} app php occ upgrade
 
 d.nextcloud:
 	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
-	sudo chown -R www-data:www-data /var/www/html
+	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
 	docker-compose --env-file ./.env up -d
 
 d.pm2:
@@ -55,12 +55,12 @@ d.hipapp:
 	sudo rm -rf $(NC_APP_FOLDER)/hip
 	sudo mkdir $(NC_APP_FOLDER)/hip
 	sudo tar -zxvf hip/release.tar.gz -C $(NC_APP_FOLDER)/hip
-	sudo chown -R www-data:root $(NC_APP_FOLDER)
+	sudo chown -R ${DATA_USER}:${DATA_USER} $(NC_APP_FOLDER)
 
 d.socialapp:
 	sudo rm -rf $(SOCIAL_APP_FOLDER)
 	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
-	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
+	sudo chown -R ${DATA_USER}:${DATA_USER} $(SOCIAL_APP_FOLDER)
 
 #deploy.stop: @ Stop the frontend stack in production mode
 deploy.stop: 
@@ -91,7 +91,7 @@ d.hipapp.dev:
 	sudo cp -rf ./hip/lib $(NC_APP_FOLDER)/hip
 	sudo cp -rf ./hip/img $(NC_APP_FOLDER)/hip
 	sudo cp -f ./hip/templates/index.php $(NC_APP_FOLDER)/hip/templates/index.php
-	sudo chown -R www-data:root $(NC_APP_FOLDER)/hip
+	sudo chown -R ${DATA_USER}:${DATA_USER} $(NC_APP_FOLDER)/hip
 	docker-compose \
 		-f docker-compose-dev.yml \
 		--env-file ./.env \
@@ -101,7 +101,7 @@ d.socialapp.dev:
 	make -C nextcloud-social-login build
 	sudo rm -rf $(SOCIAL_APP_FOLDER)
 	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
-	sudo chown -R www-data:root $(SOCIAL_APP_FOLDER)
+	sudo chown -R ${DATA_USER}:${DATA_USER} $(SOCIAL_APP_FOLDER)
 
 d.bids-tools.dev:
 	make -C bids-tools build

@@ -58,9 +58,14 @@ d.nextcloud:
 
 d.nextcloud.update:
 	docker-compose exec --user ${DATA_USER} app php occ upgrade
+	docker-compose exec --user ${DATA_USER} app php occ maintenance:mimetype:update-db
+	docker-compose exec --user ${DATA_USER} app php occ maintenance:mimetype:update-js 
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-columns
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-indices
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-primary-keys
+	docker-compose exec --user ${DATA_USER} app php occ maintenance:repair
+	docker-compose exec --user ${DATA_USER} app php occ files:scan --all
+	docker-compose exec --user ${DATA_USER} app php occ files:cleanup 
 
 d.pm2:
 	sudo pm2 save

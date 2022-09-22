@@ -21,9 +21,15 @@ update:
 	chmod +x ghostfs/GhostFS
 	echo `./ghostfs/GhostFS --version`
 
-#dump: @ Dump the current state of the HIP
+#dump: @ Dump the current NextCloud DB of the HIP
 dump:
 	docker-compose exec db pg_dump -U hipadmin nextcloud_db > $(shell date +%Y%m%d_%H%M%S).dump
+
+#repair: @ Attempt to repair NextCloud
+repair: d.nextcloud.upgrade
+	docker-compose exec --user ${DATA_USER} app php occ maintenance:repair
+	docker-compose exec --user ${DATA_USER} app php occ files:scan --all
+	docker-compose exec --user ${DATA_USER} app php occ files:cleanup 
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
@@ -46,7 +52,7 @@ b.bids-tools:
 	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack in production mode
-deploy: build d.nextcloud d.pm2 d.nextcloud sleep-5 d.nextcloud.update d.hipapp d.socialapp
+deploy: build d.nextcloud d.pm2 d.nextcloud sleep-5 d.nextcloud.upgrade d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
 
@@ -56,16 +62,13 @@ d.nextcloud:
 	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
 	docker-compose --env-file ./.env up -d
 
-d.nextcloud.update:
+d.nextcloud.upgrade:
 	docker-compose exec --user ${DATA_USER} app php occ upgrade
 	docker-compose exec --user ${DATA_USER} app php occ maintenance:mimetype:update-db
 	docker-compose exec --user ${DATA_USER} app php occ maintenance:mimetype:update-js 
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-columns
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-indices
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-primary-keys
-	docker-compose exec --user ${DATA_USER} app php occ maintenance:repair
-	docker-compose exec --user ${DATA_USER} app php occ files:scan --all
-	docker-compose exec --user ${DATA_USER} app php occ files:cleanup 
 
 d.pm2:
 	sudo pm2 save
@@ -90,7 +93,7 @@ deploy.stop:
 	docker ps
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: b.nextcloud d.nextcloud.dev sleep-5 d.nextcloud.update d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+deploy.dev: b.nextcloud d.nextcloud.dev sleep-5 d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
 deploy.dev.gateway:
 	sudo make -C gateway deploy.dev

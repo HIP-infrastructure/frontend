@@ -9,6 +9,7 @@ sleep-%:
 #install: @ Install all depencies for the HIP
 # TODO: SHELL:=/bin/bash
 install:
+	make -C gateway install
 	bash ./install_ghostfs.sh
 
 #update: @ Update all submodules for the HIP
@@ -16,8 +17,9 @@ update:
 	git pull
 	git submodule update --init --recursive
 	rm -f ghostfs/GhostFS
-	curl -L# https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-$GHOSTFS_VERSION/GhostFS -o ghostfs/GhostFS
+	wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-${GHOSTFS_VERSION}/GhostFS -= ghostfs/GhostFS
 	chmod +x ghostfs/GhostFS
+	echo ./ghostfs/GhostFS --version
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
@@ -42,7 +44,6 @@ b.bids-tools:
 deploy: build d.nextcloud d.pm2 d.nextcloud sleep-5 d.nextcloud.update d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
-	docker-compose exec --user ${DATA_USER} app php occ upgrade
 
 d.nextcloud:
 	sudo mkdir -p /var/www

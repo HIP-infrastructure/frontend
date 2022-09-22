@@ -13,8 +13,8 @@ sudo pip3 install -r ghostfs/auth_backend/requirements.txt
 if ! command -v pm2 &> /dev/null
 then
     echo "pm2 could not be found, installing..."
-    curl -sL https://deb.nodesource.com/setup_current.x | sudo -E bash -
-    sudo apt-get install -y nodejs
+    # curl -sL https://deb.nodesource.com/setup_current.x | sudo -E bash -
+    # sudo apt-get install -y nodejs
     sudo npm install pm2 -g
     echo "pm2 installed."
 fi

@@ -3,6 +3,9 @@
 include .env
 export
 
+sleep-%:
+	sleep $(@:sleep-%=%)
+
 #install: @ Install all depencies for the HIP
 # TODO: SHELL:=/bin/bash
 install:
@@ -36,7 +39,7 @@ b.bids-tools:
 	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack in production mode
-deploy: build d.nextcloud d.pm2 d.nextcloud d.hipapp d.socialapp
+deploy: build d.nextcloud d.pm2 d.nextcloud sleep-5 d.nextcloud.update d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
 	docker-compose exec --user ${DATA_USER} app php occ upgrade
@@ -46,6 +49,12 @@ d.nextcloud:
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
 	docker-compose --env-file ./.env up -d
+
+d.nextcloud.update:
+	docker-compose exec --user ${DATA_USER} app php occ upgrade
+	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-columns
+	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-indices
+	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-primary-keys
 
 d.pm2:
 	sudo pm2 save
@@ -70,8 +79,11 @@ deploy.stop:
 	docker ps
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: b.nextcloud d.nextcloud.dev d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
-	docker-compose exec --user ${DATA_USER} app php occ upgrade
+deploy.dev: b.nextcloud d.nextcloud.dev sleep-5 d.nextcloud.update d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+
+deploy.dev.gateway:
+	sudo make -C gateway deploy.dev
+	sudo make -C gateway deploy.dev.stop
 
 d.nextcloud.dev:
 	sudo mkdir -p /var/www
@@ -91,7 +103,7 @@ d.hipapp.dev:
 	sudo cp -rf ./hip/appinfo $(NC_APP_FOLDER)/hip
 	sudo cp -rf ./hip/lib $(NC_APP_FOLDER)/hip
 	sudo cp -rf ./hip/img $(NC_APP_FOLDER)/hip
-	sudo cp -f ./hip/templates/index.php $(NC_APP_FOLDER)/hip/templates/index.php
+	sudo cp -f ./hip/templates/index.dev.php $(NC_APP_FOLDER)/hip/templates/index.php
 	sudo chown -R ${DATA_USER}:${DATA_USER} $(NC_APP_FOLDER)/hip
 
 d.socialapp.dev:

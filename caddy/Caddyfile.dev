@@ -17,17 +17,17 @@ log {
 
 # hip nextcloud app, dev proxy to frontend
 handle /apps/hip/static/* {
-	reverse_proxy hip:3000
+	reverse_proxy {$FRONTEND_REVERSE_PROXY}
 }
 
 handle /apps/hip/css/* {
-	reverse_proxy hip:3000
+	reverse_proxy {$FRONTEND_REVERSE_PROXY}
 }
 
 handle /sockjs-node/* {
 	header Connection *Upgrade*
 	header Upgrade websocket
-	reverse_proxy hip:3000
+	reverse_proxy {$FRONTEND_REVERSE_PROXY}
 }
 
 handle /api/v1/* {

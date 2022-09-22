@@ -17,9 +17,13 @@ update:
 	git pull
 	git submodule update --init --recursive
 	rm -f ghostfs/GhostFS
-	wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-${GHOSTFS_VERSION}/GhostFS -= ghostfs/GhostFS
+	wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-${GHOSTFS_VERSION}/GhostFS -O ghostfs/GhostFS
 	chmod +x ghostfs/GhostFS
-	echo ./ghostfs/GhostFS --version
+	echo `./ghostfs/GhostFS --version`
+
+#dump: @ Dump the current state of the HIP
+dump:
+	docker-compose exec db pg_dump -U hipadmin nextcloud_db > $(shell date +%Y%m%d_%H%M%S).dump
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
@@ -27,6 +31,7 @@ build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
 b.nextcloud:
 	docker-compose --env-file ./.env build app
 	docker-compose --env-file ./.env build cron
+	sudo chown root:root nextcloud-docker/crontab
 
 b.hipapp:
 	make -C hip build

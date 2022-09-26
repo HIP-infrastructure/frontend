@@ -51,11 +51,12 @@ b.gateway:
 b.bids-tools:
 	sudo make -C bids-tools build
 
-#deploy: @ Deploy the frontend stack in production mode
+#deploy: @ Deploy the frontend stack without ghsotfs in production mode
 deploy: build d.nextcloud d.pm2.caddy d.nextcloud sleep-5 d.nextcloud.upgrade d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
 
+#deploy: @ Deploy the frontend stack and ghostfs in production mode
 deploy.with-ghostf: deploy d.pm2.ghostfs
 	sudo pm2 status
 
@@ -92,13 +93,14 @@ d.socialapp:
 	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
 	sudo chown -R ${DATA_USER}:${DATA_USER} $(SOCIAL_APP_FOLDER)
 
-#deploy.stop: @ Stop the frontend stack in production mode
+#deploy.stop: @ Stop the frontend stack and ghostfs in production mode
 deploy.stop: 
 	docker-compose stop
 	sudo pm2 stop pm2/ecosystem.config.js
 	sudo pm2 status
 	docker ps
 
+#deploy.stop: @ Stop the frontend stack with ghostfs in production mode
 deploy.stop.with-ghostfs: deploy.stop
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	sudo pm2 status

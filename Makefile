@@ -52,9 +52,12 @@ b.bids-tools:
 	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack in production mode
-deploy: build d.nextcloud d.pm2 d.nextcloud sleep-5 d.nextcloud.upgrade d.hipapp d.socialapp
+deploy: build d.nextcloud d.pm2.caddy d.nextcloud sleep-5 d.nextcloud.upgrade d.hipapp d.socialapp
 	sudo pm2 status
 	docker ps
+
+deploy.with-ghostf: deploy d.pm2.ghostfs
+	sudo pm2 status
 
 d.nextcloud:
 	sudo mkdir -p /var/www
@@ -70,9 +73,13 @@ d.nextcloud.upgrade:
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-indices
 	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-primary-keys
 
-d.pm2:
+d.pm2.caddy:
 	sudo pm2 save
 	sudo pm2 start pm2/ecosystem.config.js
+
+d.pm2.ghostfs:
+	sudo pm2 save
+	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 
 d.hipapp:
 	sudo rm -rf $(NC_APP_FOLDER)/hip

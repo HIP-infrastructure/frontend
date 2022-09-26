@@ -99,7 +99,7 @@ deploy.stop:
 	sudo pm2 status
 	docker ps
 
-deploy.stop.withghostfs: deploy.stop
+deploy.stop.with-ghostfs: deploy.stop
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	sudo pm2 status
 

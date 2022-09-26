@@ -99,6 +99,10 @@ deploy.stop:
 	sudo pm2 status
 	docker ps
 
+deploy.stop.withghostfs: deploy.stop
+	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
+	sudo pm2 status
+
 #deploy.dev: @ Deploy the frontend stack in dev mode
 deploy.dev: b.nextcloud d.nextcloud.dev sleep-5 d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 

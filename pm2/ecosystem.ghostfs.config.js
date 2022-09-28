@@ -7,9 +7,13 @@ const relative = (...dir) => path.resolve(__dirname, ...dir);
 
 const gunicorn = which("gunicorn");
 
+const env = dotenv.config({ path: relative("../.env") }).parsed;
+
 const data = "/mnt/nextcloud-dp/nextcloud/data";
 const host = "0.0.0.0";
 const suffix = "files";
+const cert = env.GHOSTFS_CERT;
+const key = env.GHOSTFS_KEY;
 
 module.exports = {
   apps: [
@@ -18,7 +22,7 @@ module.exports = {
       cwd: relative('../ghostfs'),
       name: 'ghostfs',
       watch: false,
-      args: `-s /bin/sh www-data -c "./GhostFS --server --root ${data} --bind ${host} --suffix ${suffix}"`,
+      args: `-s /bin/sh www-data -c "./GhostFS --server --root ${data} --bind ${host} --suffix ${suffix} --key ${key} --cert ${cert}"`,
     },
     {
       script: gunicorn,

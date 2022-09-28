@@ -2,7 +2,9 @@ version: "3.2"
 
 services:
   db:
-    image: postgres:14
+    container_name: db
+    hostname: db
+    image: postgres:${POSTGRES_VERSION}
     restart: always
     volumes:
       - ./nextcloud-docker/db:/var/lib/postgresql/data
@@ -18,6 +20,8 @@ services:
       - backend
 
   app:
+    container_name: app
+    hostname: app
     image: nextcloud:${NEXTCLOUD_VERSION}
     restart: always
     ports:
@@ -52,6 +56,8 @@ services:
       - frontend
 
   cron:
+    container_name: cron
+    hostname: cron
     build:
      context: ./nextcloud-docker/nextcloud
      args:
@@ -64,6 +70,8 @@ services:
     entrypoint: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
 
   redis:
+    container_name: redis
+    hostname: redis
     image: redis:latest
     #environment:
     #  - REDIS_HOST_PASSWORD=/run/secrets/redis_password
@@ -78,6 +86,8 @@ services:
       - backend
 
   cache:
+    container_name: cache
+    hostname: cache
     image: redis:latest
     command: redis-server --appendonly yes
     restart: always

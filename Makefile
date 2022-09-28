@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 .DEFAULT_GOAL := help
 
 include .env
@@ -7,7 +9,6 @@ sleep-%:
 	sleep $(@:sleep-%=%)
 
 #install: @ Install all depencies for the HIP
-# TODO: SHELL:=/bin/bash
 install:
 	make -C gateway install
 	bash ./install_ghostfs.sh
@@ -27,9 +28,9 @@ dump:
 
 #repair: @ Attempt to repair NextCloud
 repair: d.nextcloud.upgrade
-	docker-compose exec --user ${DATA_USER} app php occ maintenance:repair
-	docker-compose exec --user ${DATA_USER} app php occ files:scan --all
-	docker-compose exec --user ${DATA_USER} app php occ files:cleanup 
+	docker-compose exec --user ${DATA_USER} cron php occ maintenance:repair
+	docker-compose exec --user ${DATA_USER} cron php occ files:scan --all
+	docker-compose exec --user ${DATA_USER} cron php occ files:cleanup 
 
 #build : @ Build components locally
 build: b.nextcloud b.hipapp b.socialapp b.gateway b.bids-tools
@@ -67,12 +68,12 @@ d.nextcloud:
 	docker-compose --env-file ./.env up -d
 
 d.nextcloud.upgrade:
-	docker-compose exec --user ${DATA_USER} app php occ upgrade
-	docker-compose exec --user ${DATA_USER} app php occ maintenance:mimetype:update-db
-	docker-compose exec --user ${DATA_USER} app php occ maintenance:mimetype:update-js 
-	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-columns
-	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-indices
-	docker-compose exec --user ${DATA_USER} app php occ db:add-missing-primary-keys
+	docker-compose exec --user ${DATA_USER} cron php occ upgrade
+	docker-compose exec --user ${DATA_USER} cron php occ maintenance:mimetype:update-db
+	docker-compose exec --user ${DATA_USER} cron php occ maintenance:mimetype:update-js 
+	docker-compose exec --user ${DATA_USER} cron php occ db:add-missing-columns
+	docker-compose exec --user ${DATA_USER} cron php occ db:add-missing-indices
+	docker-compose exec --user ${DATA_USER} cron php occ db:add-missing-primary-keys
 
 d.pm2.caddy:
 	sudo pm2 save

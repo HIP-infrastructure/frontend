@@ -1,28 +1,9 @@
 version: "3.7"
 
 services:
-  gateway:
-    build:
-      context: ./gateway
-      target: base
-    working_dir: /base
-    restart: always
-    environment:
-      - NODE_ENV=development
-      - REMOTE_APP_API=${REMOTE_APP_API}
-      - REMOTE_APP_BASIC_AUTH=${REMOTE_APP_BASIC_AUTH}
-      - PRIVATE_WEBDAV_URL=${PRIVATE_WEBDAV_URL}
-      - HIP_ADMIN=${HIP_ADMIN}
-    volumes:
-      - ./gateway:/base
-      - /base/node_modules
-    expose:
-      - 4000
-    networks:
-      - nextcloud-docker_frontend
-    command: npm run start:dev
-
   hip:
+    container_name: hip
+    hostname: hip
     build: 
       context: ./hip 
       target: base
@@ -37,25 +18,10 @@ services:
       - GATEWAY_API=${GATEWAY_API}
       - MATOMO_URL_BASE=${MATOMO_URL_BASE}
       - MATOMO_SITE_ID=${MATOMO_SITE_ID}
-    expose:
-      - 3000
+    ports:
+      - 3000:3000
     command: npm run start
     networks:
-      - nextcloud-docker_frontend
+      - frontend
 
-  cache:
-    image: redis:latest
-    command: redis-server --appendonly yes
-    restart: always
-    volumes:
-      - ./gateway/redis/data:/data
-    expose: 
-      - 6379
-    ports:
-      - 127.0.0.1:6379:6379
-    networks:
-      - nextcloud-docker_frontend
-
-networks:
-  nextcloud-docker_frontend:
-    external: true
+  

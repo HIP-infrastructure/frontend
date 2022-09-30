@@ -58,6 +58,7 @@ else
     echo "Creating SSL certificate..."
     openssl req -nodes -x509 -newkey rsa:4096 -keyout ghostfs/key.pem -out ghostfs/cert.pem -sha256 -days 365 -subj "/CN=${HOSTNAME}"
     sudo chgrp www-data ghostfs/key.pem ghostfs/cert.pem
+    sudo chmod 640 ghostfs/*.pem
 fi
 
 rm -f ghostfs/GhostFS

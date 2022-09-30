@@ -62,7 +62,7 @@ b.bids-tools:
 	sudo make -C bids-tools build
 
 #deploy: @ Deploy the frontend stack without ghsotfs in production mode
-deploy: build d.nextcloud d.pm2.caddy d.nextcloud sleep-5 d.nextcloud.upgrade d.hipapp d.socialapp
+deploy: build d.nextcloud d.pm2.caddy d.nextcloud sleep-5 d.nextcloud.config d.nextcloud.upgrade d.hipapp d.socialapp
 	sudo pm2 save
 	sudo pm2 startup
 	sudo systemctl start pm2-root
@@ -81,6 +81,16 @@ d.nextcloud:
 	docker-compose --env-file ./.env up -d
 	#TODO
 	# install NC apps, hip, sociallogin, groupfolders etc. apps <- occ
+
+d.nextcloud.config:
+	docker-compose exec --user www-data app php occ app:enable hip
+	docker-compose exec --user www-data app php occ app:enable user_status
+	docker-compose exec --user www-data app php occ app:enable sociallogin
+	docker-compose exec --user www-data app php occ app:enable spreed
+	docker-compose exec --user www-data app php occ app:enable forms
+	docker-compose exec --user www-data app php occ app:enable groupfolders
+	docker-compose exec --user www-data app php occ app:enable bruteforcesettings
+	docker-compose exec --user www-data app php occ app:enable richdocumentscode
 
 d.nextcloud.upgrade:
 	docker-compose exec --user ${DATA_USER} cron php occ upgrade
@@ -120,7 +130,7 @@ deploy.stop.with-ghostfs: deploy.stop
 	sudo pm2 status
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: b.nextcloud.no-cache d.nextcloud.dev sleep-5 d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+deploy.dev: b.nextcloud.no-cache d.nextcloud.dev sleep-5 d.nextcloud.config d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
 deploy.dev.gateway:
 	sudo make -C gateway deploy.dev

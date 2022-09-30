@@ -40,6 +40,11 @@ b.nextcloud:
 	docker-compose --env-file ./.env build cron
 	sudo chown root:root nextcloud-docker/crontab
 
+b.nextcloud.no-cache:
+	docker-compose --env-file ./.env build --no-cache app
+	docker-compose --env-file ./.env build --no-cache cron
+	sudo chown root:root nextcloud-docker/crontab
+
 b.hipapp:
 	make -C hip build
 
@@ -54,6 +59,10 @@ b.bids-tools:
 
 #deploy: @ Deploy the frontend stack without ghsotfs in production mode
 deploy: build d.nextcloud d.pm2.caddy d.nextcloud sleep-5 d.nextcloud.upgrade d.hipapp d.socialapp
+	sudo pm2 save
+	sudo pm2 startup
+	sudo systemctl start pm2-root
+	sudo systemctl enable pm2-root
 	sudo pm2 status
 	docker ps
 
@@ -66,6 +75,8 @@ d.nextcloud:
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
 	docker-compose --env-file ./.env up -d
+	#TODO
+	# install NC apps, hip, sociallogin, groupfolders etc. apps <- occ
 
 d.nextcloud.upgrade:
 	docker-compose exec --user ${DATA_USER} cron php occ upgrade
@@ -76,11 +87,10 @@ d.nextcloud.upgrade:
 	docker-compose exec --user ${DATA_USER} cron php occ db:add-missing-primary-keys
 
 d.pm2.caddy:
-	sudo pm2 save
 	sudo pm2 start pm2/ecosystem.config.js
 
 d.pm2.ghostfs:
-	sudo pm2 save
+	#TODO [ ! -L /ghostfs/key.pem ] && (cd ghostfs && ./gen_cert.sh ${HOSTNAME} && cd ..) || true
 	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 
 d.hipapp:
@@ -107,7 +117,7 @@ deploy.stop.with-ghostfs: deploy.stop
 	sudo pm2 status
 
 #deploy.dev: @ Deploy the frontend stack in dev mode
-deploy.dev: b.nextcloud d.nextcloud.dev sleep-5 d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
+deploy.dev: b.nextcloud.no-cache d.nextcloud.dev sleep-5 d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
 deploy.dev.gateway:
 	sudo make -C gateway deploy.dev

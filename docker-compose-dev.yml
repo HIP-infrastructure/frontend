@@ -24,4 +24,35 @@ services:
     networks:
       - frontend
 
+  cron:
+    container_name: cron
+    hostname: cron
+    build:
+     context: ./nextcloud-docker/nextcloud
+     args:
+      - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION}
+    restart: always
+    volumes:
+      - /mnt/nextcloud-dp/nextcloud:/var/www/html
+      - /mnt/nextcloud-dp/php-settings:/usr/local/etc
+      - ./nextcloud-docker/crontab:/var/spool/cron/crontabs/www-data:ro
+      - ./nextcloud-docker/nextcloud/nextcloud-inotifyscan:/nextcloud-inotifyscan
+    environment: 
+      - POSTGRES_HOST=db
+      - POSTGRES_DB_FILE=/run/secrets/postgres_db
+      - POSTGRES_USER_FILE=/run/secrets/postgres_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
+      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
+      - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
+      - REDIS_HOST=redis
+    depends_on: 
+      - db
+      - redis
+    networks:
+      - backend
+      - frontend
+    entrypoint: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+
   

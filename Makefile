@@ -12,6 +12,9 @@ sleep-%:
 install:
 	make -C gateway install
 	bash ./install_ghostfs.sh
+	cd pm2 && npm i && cd ..
+	# TODO echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
+
 
 #update: @ Update all submodules for the HIP
 update:
@@ -21,6 +24,7 @@ update:
 	wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-${GHOSTFS_VERSION}/GhostFS -O ghostfs/GhostFS
 	chmod +x ghostfs/GhostFS
 	echo `./ghostfs/GhostFS --version`
+
 
 #dump: @ Dump the current NextCloud DB of the HIP
 dump:
@@ -90,7 +94,6 @@ d.pm2.caddy:
 	sudo pm2 start pm2/ecosystem.config.js
 
 d.pm2.ghostfs:
-	#TODO [ ! -L /ghostfs/key.pem ] && (cd ghostfs && ./gen_cert.sh ${HOSTNAME} && cd ..) || true
 	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 
 d.hipapp:

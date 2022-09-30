@@ -52,6 +52,14 @@ else
     cp ghostfs/auth_backend/auth_backend.env.template ghostfs/auth_backend/auth_backend.env
 fi
 
+if [ -f ./ghostfs/key.pem ]; then
+    echo "./ghostfs/key.pem exists, not creating."
+else
+    echo "Creating SSL certificate..."
+    openssl req -nodes -x509 -newkey rsa:4096 -keyout ghostfs/key.pem -out ghostfs/cert.pem -sha256 -days 365 -subj "/CN=${HOSTNAME}"
+    sudo chgrp www-data ghostfs/key.pem ghostfs/cert.pem
+fi
+
 rm -f ghostfs/GhostFS
 curl -L# https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-$GHOSTFS_VERSION/GhostFS -o ghostfs/GhostFS
 chmod +x ghostfs/GhostFS

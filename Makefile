@@ -78,9 +78,12 @@ d.nextcloud:
 	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
+
+	sudo rm -rf ${NC_DATA_FOLDER}/core/skeleton
+	sudo cp -r hip/skeleton/ ${NC_DATA_FOLDER}/core/
+	sudo chown -R ${DATA_USER}:${DATA_USER} ${NC_DATA_FOLDER}/core/skeleton
+
 	docker-compose --env-file ./.env up -d
-	#TODO
-	# install NC apps, hip, sociallogin, groupfolders etc. apps <- occ
 
 d.nextcloud.config:
 	docker-compose exec --user www-data app php occ app:enable hip

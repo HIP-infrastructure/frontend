@@ -74,6 +74,10 @@ deploy: build d.nextcloud d.pm2.caddy d.nextcloud sleep-5 d.nextcloud.config d.n
 deploy.with-ghostf: deploy d.pm2.ghostfs
 	sudo pm2 status
 
+deploy.webapp: b.hipapp d.hipapp b.gateway
+	sudo pm2 restart gateway
+	sudo pm2 status
+
 d.nextcloud:
 	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true

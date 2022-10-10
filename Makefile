@@ -25,7 +25,6 @@ update:
 	chmod +x ghostfs/GhostFS
 	echo `./ghostfs/GhostFS --version`
 
-
 #dump: @ Dump the current NextCloud DB of the HIP
 dump:
 	docker-compose exec db pg_dump -U hipadmin nextcloud_db > $(shell date +%Y%m%d_%H%M%S).dump
@@ -140,8 +139,8 @@ deploy.stop.with-ghostfs: deploy.stop
 deploy.dev: b.nextcloud.no-cache d.nextcloud.dev sleep-5 d.nextcloud.config d.nextcloud.upgrade d.pm2.dev d.hipapp.dev d.socialapp.dev d.bids-tools.dev d.gateway.dev
 
 deploy.dev.gateway:
-	sudo make -C gateway deploy.dev
 	sudo make -C gateway deploy.dev.stop
+	sudo make -C gateway deploy.dev
 
 d.nextcloud.dev:
 	sudo mkdir -p /var/www

@@ -97,6 +97,14 @@ d.nextcloud.config:
 	docker-compose exec --user www-data app php occ app:enable groupfolders
 	docker-compose exec --user www-data app php occ app:enable bruteforcesettings
 	docker-compose exec --user www-data app php occ app:enable richdocumentscode
+	docker-compose exec --user www-data app php occ app:enable fulltextsearch
+	docker-compose exec --user www-data app php occ app:enable fulltextsearch_elasticsearch
+	docker-compose exec --user www-data app php occ app:enable files_fulltextsearch
+	docker-compose exec --user www-data app php occ config:app:set fulltextsearch search_platform --value="OCA\FullTextSearch_Elasticsearch\Platform\ElasticSearchPlatform"
+	docker-compose exec --user www-data app php occ config:app:set fulltextsearch app_navigation --value="1"
+	docker-compose exec --user www-data app php occ config:app:set fulltextsearch_elasticsearch elastic_host --value="${ELASTICSEARCH_URL}"
+	docker-compose exec --user www-data app php occ config:app:set fulltextsearch_elasticsearch elastic_index --value="nextcloud"
+	docker-compose exec --user www-data app php occ fulltextsearch:index
 
 d.nextcloud.upgrade:
 	docker-compose exec --user ${DATA_USER} cron php occ upgrade

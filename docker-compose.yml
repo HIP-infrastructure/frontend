@@ -1,4 +1,4 @@
-version: "3.2"
+version: '3.2'
 
 services:
   db:
@@ -67,7 +67,7 @@ services:
     environment: *nextcloud_env
     depends_on: *nextcloud_dep
     networks: *nextcloud_net
-    entrypoint: ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
+    entrypoint: ['/usr/bin/supervisord', '-c', '/supervisord.conf']
 
   redis:
     container_name: redis

@@ -83,7 +83,7 @@ d.nextcloud:
 	sudo chown -R ${DATA_USER}:${DATA_USER} /var/www/html
 
 	sudo rm -rf ${NC_DATA_FOLDER}/core/skeleton
-	sudo cp -r hip/skeleton/ ${NC_DATA_FOLDER}/core/
+	sudo cp -r hip/skeleton ${NC_DATA_FOLDER}/core/
 	sudo chown -R ${DATA_USER}:${DATA_USER} ${NC_DATA_FOLDER}/core/skeleton
 
 	docker-compose --env-file ./.env up -d

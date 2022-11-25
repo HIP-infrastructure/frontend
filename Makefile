@@ -25,6 +25,16 @@ update:
 	chmod +x ghostfs/GhostFS
 	echo `./ghostfs/GhostFS --version`
 
+update.dev:
+	git pull
+	cd hip && git pull && cd ..
+	cd gateway && git pull && cd ..
+	cd nextcloud-docker && git pull && cd ..
+	cd bids-tools && git pull && cd ..
+	cd nextcloud-social-login && git pull && cd ..
+	cd ghostfs && git pull && cd ..
+
+
 #dump: @ Dump the current NextCloud DB of the HIP
 dump:
 	docker-compose exec db pg_dump -U hipadmin nextcloud_db > $(shell date +%Y%m%d_%H%M%S).dump
@@ -164,6 +174,7 @@ d.pm2.dev:
 	sudo pm2 start pm2/ecosystem.dev.config.js
 
 d.hipapp.dev:
+	docker-compose -f docker-compose.yml -f docker-compose-dev.yml build --no-cache hip
 	sudo mkdir -p $(NC_APP_FOLDER)/hip/templates
 	sudo cp -rf ./hip/appinfo $(NC_APP_FOLDER)/hip
 	sudo cp -rf ./hip/lib $(NC_APP_FOLDER)/hip

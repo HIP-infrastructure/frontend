@@ -10,7 +10,7 @@ DC=docker-compose --env-file ./.env -f docker-compose.yml
 OCC=docker-compose exec --user www-data app php occ
 
 #install: @ ** USE THIS ONE ** Stop, update, build and install the latest HIP, without GhostFS 
-install: maintenance-on stop configure build install-nextcloud nextcloud-config install-hipapp install-socialapp maintenance-off
+install: stop update build install-nextcloud nextcloud-config install-hipapp install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js
 	sudo pm2 save
 	sudo pm2 startup
@@ -28,14 +28,16 @@ status:
 	sudo pm2 status
 	docker-compose ps
 
+logs:
+	sudo pm2 logs $(n)
+
 update:
 	git pull
 	git submodule update --init --recursive
 	cd pm2 && npm i && cd ..
 
 build:
-	$(DC) build app
-	$(DC) ./.env build cron
+	$(DC) build cron
 	sudo chown root:root nextcloud-docker/crontab
 	make -C nextcloud-social-login build
 	sudo make -C bids-tools build
@@ -137,7 +139,6 @@ dev-update:
 	# cd nextcloud-social-login && git stash && git checkout $(branch) && git pull && cd ..
 
 dev-build:
-	$(DC) build app
 	$(DC) build cron
 	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
@@ -145,7 +146,7 @@ dev-build:
 	$(DC) -f docker-compose-dev.yml build --no-cache hip
 	make -C bids-tools build
 
-#dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch
+#dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
 dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true

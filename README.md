@@ -20,18 +20,14 @@ As the package will migrate to K8s, everything is build on the host
 - Clone this repo, 
 - `cd frontend`
 - `git checkout master`
-- `git submodule update --recursive --init`
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
-
- the first time `make dep.init`  
-`make deploy `
 
 The first time, you have also to install Nextcloud. 
 
 - Follow the first 3 steps in [Nextcloud Install](./nextcloud-docker/README.md)
-- Run the `./init.sh`, wait for the db to be installed then `^C`
+- In the nextcloud-docker folder, run `./init.sh`, wait for the db to be installed then `^C`
 - Once Nextcloud is installed, we need to replace the created php-settings by our own in order to parametrize it for docker etc.
-  - `make deploy.stop`
+  - `make stop`
   - `sudo rm -rf /mnt/nextcloud-dp/php-settings`
   - `sudo cp -r php-settings /mnt/nextcloud-dp`
 - Add some params to the Nextcloud php config in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
@@ -40,13 +36,35 @@ The first time, you have also to install Nextcloud.
     'htaccess.IgnoreFrontController' => true,     
     'defaultapp' => 'hip'  
     ```  
-- `make deploy`
+- `make install`
 - Open your browser to your ip or hostname
-- Go in apps -> disabled apps -> enable untested app -> HIP
-
 
 to stop 
-`make deploy.stop`
+`make stop`
 
+help:
+  `make`
+
+```
+install                        ** USE THIS ONE ** Stop, update, build and install the latest HIP, without GhostFS 
+install-ghostfs                Stop, update and install GhostFS only
+status                         Show the status of the HIP
+install-web                    Build & nnstall only the gateway, bids-tools and the webapp
+start                          Start all services (-GhostFS)
+stop                           Stop all services (-GhostFS)
+maintenance                    Enable/disable maintenance mode (make maintenance-on/maintenance-off)
+nextcloud-repair               Attempt to repair NextCloud
+nextcloud-upgrade              Upgrade NextCloud
+nextcloud-dump                 Dump the current NextCloud DB (Postgres)
+dev-install                    Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
+dev-restart-gateway            Restart the dev gateway
+help                           List available tasks on this project
+
+```
+## Deploy, dev
 dev:
-`make deploy.dev`
+`make dev-install`
+
+
+
+

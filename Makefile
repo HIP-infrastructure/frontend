@@ -9,13 +9,15 @@ SOCIAL_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/custom_apps/sociallogin
 DC=docker-compose --env-file ./.env -f docker-compose.yml
 OCC=docker-compose exec --user www-data app php occ
 
-#install: @ ** USE THIS ONE ** Stop, update, build and install the latest HIP, without GhostFS 
-install: stop update build install-nextcloud nextcloud-config install-hipapp install-socialapp
+install-no-update: stop build install-nextcloud nextcloud-config install-hipapp install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js
 	sudo pm2 save
 	sudo pm2 startup
 	sudo systemctl start pm2-root
 	sudo systemctl enable pm2-root
+
+#install: @ ** USE THIS ONE ** Stop, update, build and install the latest HIP, without GhostFS 
+install: update install-no-update
 
 #install-ghostfs: @ Stop, update and install GhostFS only
 install-ghostfs: 

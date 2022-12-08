@@ -9,20 +9,21 @@ SOCIAL_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/custom_apps/sociallogin
 DC=docker-compose --env-file ./.env -f docker-compose.yml
 OCC=docker-compose exec --user www-data app php occ
 
-install-no-update: stop build install-nextcloud nextcloud-config install-hipapp install-socialapp
+install-current-branch: stop build install-nextcloud nextcloud-config install-hipapp install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js
 	sudo pm2 save
 	sudo pm2 startup
 	sudo systemctl start pm2-root
 	sudo systemctl enable pm2-root
 
-#install: @ ** USE THIS ONE ** Stop, update, build and install the latest HIP, without GhostFS 
-install: update install-no-update
+#install: @ * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
+install: update install-current-branch
 
 #install-ghostfs: @ Stop, update and install GhostFS only
 install-ghostfs: 
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	bash ./install_ghostfs.sh
+	$(DC) restart cron
 	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 
 #status: @ Show the status of the HIP
@@ -43,16 +44,18 @@ build:
 	sudo chown root:root nextcloud-docker/crontab
 	make -C nextcloud-social-login build
 	sudo make -C bids-tools build
+	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
 	# TODO echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
 
 build-web:
 	sudo make -C bids-tools build
+	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
 
-#install-web: @ Build & nnstall only the gateway, bids-tools and the webapp
+#install-web: @ Build & install only the gateway, bids-tools and the webapp
 install-web: maintenance-on build-web install-hipapp maintenance-off
 	sudo pm2 restart gateway
 	sudo pm2 status
@@ -152,11 +155,13 @@ dev-build:
 dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true
-	sudo make -C gateway dev-install
+	cp .env gateway/.env
+	sudo make -C gateway deploy.dev
 
 #dev-restart-gateway: @ Restart the dev gateway
-dev-restart-gateway:
-	sudo make -C gateway dev-install
+dev-restart-gateway: dev-stop-gateway
+	cp .env gateway/.env
+	sudo make -C gateway deploy.dev
 
 dev-stop-gateway:
 	for pid in $(ps -fu www-data  | grep gateway | awk '{ print $2 }'); do sudo kill -9 $pid; done 

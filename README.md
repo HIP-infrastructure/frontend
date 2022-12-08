@@ -65,6 +65,10 @@ help                           List available tasks on this project
 dev:
 `make dev-install`
 
+## Deploy a specific branch in production
+`make dev-update branch=dev`
+`make install-current-branch`
+
 
 
 

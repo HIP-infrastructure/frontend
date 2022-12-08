@@ -158,10 +158,15 @@ dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-c
 	cp .env gateway/.env
 	sudo make -C gateway deploy.dev
 
-#dev-restart-gateway: @ Restart the dev gateway
-dev-restart-gateway: dev-stop-gateway
+#dev-install-gateway: @ Restart the dev gateway
+dev-install-gateway: dev-stop-gateway
 	cp .env gateway/.env
 	sudo make -C gateway deploy.dev
+
+dev-install-frontend:
+	$(DC) -f docker-compose-dev.yml build --no-cache hip
+	$(DC) -f docker-compose-dev.yml stop hip
+	$(DC) -f docker-compose-dev.yml start hip
 
 dev-stop-gateway:
 	for pid in $(ps -fu www-data  | grep gateway | awk '{ print $2 }'); do sudo kill -9 $pid; done 

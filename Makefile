@@ -44,7 +44,6 @@ git-checkout-beta:
 	cd bids-tools 				&& git stash && git checkout 93e81a0a4d687a2b52a852e115de8523610184ae && cd ..
 	cd nextcloud-social-login 	&& git stash && git checkout a88abf777935b82f69d347938d6d8b0cf698ceab && cd ..
 
-
 logs:
 	sudo pm2 logs $(n)
 

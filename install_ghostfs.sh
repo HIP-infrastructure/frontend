@@ -57,14 +57,14 @@ if [ -f ./ghostfs/key.pem ]; then
 else
     echo "Creating SSL certificate..."
     openssl req -nodes -x509 -newkey rsa:4096 -keyout ghostfs/key.pem -out ghostfs/cert.pem -sha256 -days 365 -subj "/CN=${HOSTNAME}"
-    sudo chgrp www-data ghostfs/key.pem ghostfs/cert.pem
-    sudo chmod 640 ghostfs/*.pem
 fi
 
-rm -f ghostfs/GhostFS
-curl -L# https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-$GHOSTFS_VERSION/GhostFS -o ghostfs/GhostFS
-chmod +x ghostfs/GhostFS
+sudo chgrp www-data ghostfs/key.pem ghostfs/cert.pem
+sudo chmod 640 ghostfs/*.pem
 
-sudo pm2 startup
-sudo systemctl start pm2-root
-sudo systemctl enable pm2-root
+rm -f ghostfs/GhostFS
+wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-${GHOSTFS_VERSION}/GhostFS -O ghostfs/GhostFS
+chmod +x ghostfs/GhostFS
+echo `./ghostfs/GhostFS --version`
+
+

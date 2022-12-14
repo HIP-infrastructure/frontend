@@ -24,6 +24,11 @@ handle /apps/hip/css/* {
 	reverse_proxy {$FRONTEND_REVERSE_PROXY}
 }
 
+handle /es/* {
+	reverse_proxy {$ELASTICSEARCH_URL} 
+	uri strip_prefix /es
+}
+
 handle /sockjs-node/* {
 	header Connection *Upgrade*
 	header Upgrade websocket

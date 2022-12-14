@@ -18,7 +18,8 @@ install-current-branch: stop build install-nextcloud nextcloud-config install-hi
 
 #install: @ * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
 install: update install-current-branch
-	tee .mode <<< "production"
+	@echo "production" > .mode
+	@echo WARNING you must have NODE_ENV=production in your .env file
 
 #install-ghostfs: @ Stop, update and install GhostFS only
 install-ghostfs: 
@@ -145,7 +146,7 @@ dev-update:
 	cd gateway 					&& git stash && git checkout $(branch) && git pull && cd ..
 	cd nextcloud-docker 		&& git stash && git checkout $(branch) && git pull && cd ..
 	cd bids-tools 				&& git stash && git checkout $(branch) && git pull && cd ..
-	cd nextcloud-social-login 	&& git stash && git checkout $(branch) && git pull && cd ..
+	# cd nextcloud-social-login 	&& git stash && git checkout $(branch) && git pull && cd ..
 	# cd ghostfs 					&& git stash && git checkout $(branch) && git pull && cd ..
 
 dev-build:
@@ -158,10 +159,11 @@ dev-build:
 
 #dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
 dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp
-	tee .mode <<< "development"
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true
 	cp .env gateway/.env
+	@echo "production" > .mode
+	@echo WARNING you must have NODE_ENV=development in your .env file
 	sudo make -C gateway deploy.dev
 
 #dev-install-gateway: @ Restart the dev gateway

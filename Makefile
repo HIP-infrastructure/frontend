@@ -1,4 +1,4 @@
-SHELL=/bin/bash
+# SHELL=/bin/bash
 
 .DEFAULT_GOAL := help
 
@@ -18,6 +18,8 @@ install-current-branch: stop build install-nextcloud nextcloud-config install-hi
 
 #install: @ * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
 install: update install-current-branch
+	@echo "production" > .mode
+	@echo WARNING you must have NODE_ENV=production in your .env file
 
 #install-ghostfs: @ Stop, update and install GhostFS only
 install-ghostfs: 
@@ -28,8 +30,19 @@ install-ghostfs:
 
 #status: @ Show the status of the HIP
 status:
+	@echo "\n"
+	@echo "**** MODE $(shell cat .mode) ****"
+	@echo "\n"
 	sudo pm2 status
 	docker-compose ps
+
+git-checkout-beta:
+	git pull
+	cd hip 						&& git stash && git checkout ec5996b38af642bfe51b20de138e841aee03d045 && cd ..
+	cd gateway 					&& git stash && git checkout f921ec6547c538e6a4aa5e867a487e674a89c999 && cd ..
+	cd nextcloud-docker 		&& git stash && git checkout e00f1d361b8adeb6a8f7d0834dc5ed46e5fccb30 && cd ..
+	cd bids-tools 				&& git stash && git checkout 93e81a0a4d687a2b52a852e115de8523610184ae && cd ..
+	cd nextcloud-social-login 	&& git stash && git checkout a88abf777935b82f69d347938d6d8b0cf698ceab && cd ..
 
 logs:
 	sudo pm2 logs $(n)
@@ -137,11 +150,12 @@ sleep-%:
 # eg: dev-update branch=dev
 dev-update:
 	git pull
-	cd hip && git stash && git checkout $(branch) && git pull && cd ..
-	cd gateway && git stash && git checkout $(branch) && git pull && cd ..
-	# cd nextcloud-docker && git stash && git checkout $(branch) && git pull && cd ..
-	# cd bids-tools && && git stash git checkout $(branch) && git pull && cd ..
-	# cd nextcloud-social-login && git stash && git checkout $(branch) && git pull && cd ..
+	cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
+	cd gateway 					&& git stash && git checkout $(branch) && git pull && cd ..
+	cd nextcloud-docker 		&& git stash && git checkout $(branch) && git pull && cd ..
+	cd bids-tools 				&& git stash && git checkout $(branch) && git pull && cd ..
+	# cd nextcloud-social-login 	&& git stash && git checkout $(branch) && git pull && cd ..
+	# cd ghostfs 					&& git stash && git checkout $(branch) && git pull && cd ..
 
 dev-build:
 	$(DC) build cron
@@ -152,14 +166,16 @@ dev-build:
 	make -C bids-tools build
 
 #dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
-dev-install: stop dev-stop dev-stop-gateway dev-build dev-hipapp dev-socialapp dev-up sleep-5 nextcloud-config
+dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true
 	cp .env gateway/.env
+	@echo "production" > .mode
+	@echo WARNING you must have NODE_ENV=development in your .env file
 	sudo make -C gateway deploy.dev
 
 #dev-install-gateway: @ Restart the dev gateway
-dev-install-gateway: dev-stop-gateway
+dev-install-gateway: dev-stop-gateway sleep-5
 	cp .env gateway/.env
 	sudo make -C gateway deploy.dev
 
@@ -169,7 +185,7 @@ dev-install-frontend:
 	$(DC) -f docker-compose-dev.yml start hip
 
 dev-stop-gateway:
-	for pid in $(ps -fu www-data  | grep gateway | awk '{ print $2 }'); do sudo kill -9 $pid; done 
+	./stop_gateway.sh
 
 dev-stop: dev-stop-gateway
 	$(DC) -f docker-compose-dev.yml -f docker-compose-dev.yml stop

@@ -42,7 +42,7 @@ git-checkout-beta:
 	cd gateway 					&& git stash && git checkout f921ec6547c538e6a4aa5e867a487e674a89c999 && cd ..
 	cd nextcloud-docker 		&& git stash && git checkout e00f1d361b8adeb6a8f7d0834dc5ed46e5fccb30 && cd ..
 	cd bids-tools 				&& git stash && git checkout 93e81a0a4d687a2b52a852e115de8523610184ae && cd ..
-	cd nextcloud-social-login 	&& git stash && git checkout a88abf777935b82f69d347938d6d8b0cf698ceab && cd ..
+	cd nextcloud-social-login 	&& git stash && git checkout a37f26361689d52a45c5e6521feead23f9d01baf && cd ..
 
 logs:
 	sudo pm2 logs $(n)
@@ -150,11 +150,11 @@ sleep-%:
 # eg: dev-update branch=dev
 dev-update:
 	git pull
-	cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
+	# cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
 	cd gateway 					&& git stash && git checkout $(branch) && git pull && cd ..
 	cd nextcloud-docker 		&& git stash && git checkout $(branch) && git pull && cd ..
 	cd bids-tools 				&& git stash && git checkout $(branch) && git pull && cd ..
-	# cd nextcloud-social-login 	&& git stash && git checkout $(branch) && git pull && cd ..
+	cd nextcloud-social-login 	&& git stash && git checkout a37f26361689d52a45c5e6521feead23f9d01baf && cd ..
 	# cd ghostfs 					&& git stash && git checkout $(branch) && git pull && cd ..
 
 dev-build:

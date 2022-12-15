@@ -2,6 +2,24 @@
 ## Meta package for NextCloud, HIP web app and gateway API
 This is the install for the HIP frontend
 
+Quick summary
+```
+install                        * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
+install-ghostfs                Stop, update and install GhostFS only
+status                         Show the status of the HIP
+install-web                    Build & install only the gateway, bids-tools and the webapp
+start                          Start all services (-GhostFS)
+stop                           Stop all services (-GhostFS)
+maintenance                    Enable/disable maintenance mode (make maintenance-on/maintenance-off)
+nextcloud-repair               Attempt to repair NextCloud
+nextcloud-upgrade              Upgrade NextCloud
+nextcloud-dump                 Dump the current NextCloud DB (Postgres)
+dev-update                     Pull and update git submodules to a given branch eg. dev-update branch=dev
+dev-install                    Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
+dev-install-gateway            Restart the dev gateway
+help                           List available tasks on this project
+```
+
 Includes 
 - Nextcloud install [nextcloud-docker](https://github.com/HIP-infrastructure/nextcloud-docker)
 - Nextcloud HIP app [hip](https://github.com/HIP-infrastructure/hip)
@@ -36,6 +54,7 @@ The first time, you have also to install Nextcloud.
     'htaccess.IgnoreFrontController' => true,     
     'defaultapp' => 'hip'  
     ```  
+  
 - `make install`
 - Open your browser to your ip or hostname
 
@@ -45,27 +64,21 @@ to stop
 help:
   `make`
 
-```
-install                        ** USE THIS ONE ** Stop, update, build and install the latest HIP, without GhostFS 
-install-ghostfs                Stop, update and install GhostFS only
-status                         Show the status of the HIP
-install-web                    Build & nnstall only the gateway, bids-tools and the webapp
-start                          Start all services (-GhostFS)
-stop                           Stop all services (-GhostFS)
-maintenance                    Enable/disable maintenance mode (make maintenance-on/maintenance-off)
-nextcloud-repair               Attempt to repair NextCloud
-nextcloud-upgrade              Upgrade NextCloud
-nextcloud-dump                 Dump the current NextCloud DB (Postgres)
-dev-install                    Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
-dev-restart-gateway            Restart the dev gateway
-help                           List available tasks on this project
 
-```
 ## Deploy, dev
-dev:
+
+Change the NODE_ENV to development in the .env file
+
+`make dev-update branch=dev`
 `make dev-install`
 
+deploy/reload gateway
+`make dev-install-gateway`
+
 ## Deploy a specific branch in production
+
+Change the NODE_ENV to production in the .env file
+
 `make dev-update branch=dev`
 `make install-current-branch`
 

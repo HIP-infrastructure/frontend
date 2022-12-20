@@ -151,10 +151,10 @@ sleep-%:
 
 ## Dev
 
-# eg: dev-update branch=dev
+#dev-update: @ Pull and update git submodules to a given branch eg. dev-update branch=dev
 dev-update:
 	git pull
-	# cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
+	cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
 	cd gateway 					&& git stash && git checkout $(branch) && git pull && cd ..
 	cd nextcloud-docker 		&& git stash && git checkout $(branch) && git pull && cd ..
 	cd bids-tools 				&& git stash && git checkout $(branch) && git pull && cd ..

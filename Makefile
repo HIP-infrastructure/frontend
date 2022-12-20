@@ -7,7 +7,7 @@ NC_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/apps
 SOCIAL_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/custom_apps/sociallogin
 
 DC=docker-compose --env-file ./.env -f docker-compose.yml
-OCC=docker-compose exec --user www-data app php occ
+OCC=docker-compose exec --user www-data cron php occ
 
 install-current-branch: stop build install-nextcloud nextcloud-config install-hipapp install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js
@@ -108,6 +108,10 @@ install-socialapp:
 #maintenance: @ Enable/disable maintenance mode (make maintenance-on/maintenance-off)	
 maintenance-%:
 	$(OCC) maintenance:mode --$(@:maintenance-%=%)
+
+#occ: @ Run occ command (make occ c="status") (make occ c="files:scan --all") etc
+occ:
+	$(OCC) $(c)
 
 #nextcloud-repair: @ Attempt to repair NextCloud
 nextcloud-repair: d.nextcloud.upgrade

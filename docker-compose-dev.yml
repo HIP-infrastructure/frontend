@@ -18,6 +18,7 @@ services:
       - GATEWAY_API=${GATEWAY_API}
       - MATOMO_URL_BASE=${MATOMO_URL_BASE}
       - MATOMO_SITE_ID=${MATOMO_SITE_ID}
+      - POLLING_INTERVAL=${POLLING_INTERVAL}
     ports:
       - 3000:3000
     command: npm run start

@@ -56,14 +56,14 @@ build:
 	$(DC) build cron
 	sudo chown root:root nextcloud-docker/crontab
 	make -C nextcloud-social-login build
-	sudo make -C bids-tools build
+	sudo make -C bids-tools build-docker
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
 	# TODO echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
 
 build-web:
-	sudo make -C bids-tools build
+	sudo make -C bids-tools build-docker
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
@@ -167,7 +167,7 @@ dev-build:
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R www-data:www-data /var/www/html
 	$(DC) -f docker-compose-dev.yml build --no-cache hip
-	make -C bids-tools build
+	make -C bids-tools build-docker
 
 #dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
 dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp

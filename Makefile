@@ -1,5 +1,9 @@
 # SHELL=/bin/bash
 
+# Make available environment variables defined in .env file
+include .env
+export
+
 .DEFAULT_GOAL := help
 
 NC_DATA_FOLDER=/mnt/nextcloud-dp/nextcloud
@@ -41,7 +45,6 @@ git-checkout-beta:
 	cd hip 						&& git stash && git checkout ec5996b38af642bfe51b20de138e841aee03d045 && cd ..
 	cd gateway 					&& git stash && git checkout f921ec6547c538e6a4aa5e867a487e674a89c999 && cd ..
 	cd nextcloud-docker 		&& git stash && git checkout e00f1d361b8adeb6a8f7d0834dc5ed46e5fccb30 && cd ..
-	cd bids-tools 				&& git stash && git checkout 93e81a0a4d687a2b52a852e115de8523610184ae && cd ..
 	cd nextcloud-social-login 	&& git stash && git checkout a37f26361689d52a45c5e6521feead23f9d01baf && cd ..
 
 logs:
@@ -56,14 +59,20 @@ build:
 	$(DC) build cron
 	sudo chown root:root nextcloud-docker/crontab
 	make -C nextcloud-social-login build
-	sudo make -C bids-tools build
+	# sudo make -C bids-tools build-docker
+	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
+	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
+	docker logout
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
 	# TODO echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
 
 build-web:
-	sudo make -C bids-tools build
+	# sudo make -C bids-tools build-docker
+	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
+	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
+	docker logout
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
@@ -157,7 +166,6 @@ dev-update:
 	cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
 	cd gateway 					&& git stash && git checkout $(branch) && git pull && cd ..
 	cd nextcloud-docker 		&& git stash && git checkout $(branch) && git pull && cd ..
-	cd bids-tools 				&& git stash && git checkout $(branch) && git pull && cd ..
 	cd nextcloud-social-login 	&& git stash && git checkout a37f26361689d52a45c5e6521feead23f9d01baf && cd ..
 	# cd ghostfs 					&& git stash && git checkout $(branch) && git pull && cd ..
 
@@ -167,7 +175,10 @@ dev-build:
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R www-data:www-data /var/www/html
 	$(DC) -f docker-compose-dev.yml build --no-cache hip
-	make -C bids-tools build
+	# sudo make -C bids-tools build-docker
+	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
+	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
+	docker logout
 
 #dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
 dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp

@@ -59,7 +59,6 @@ build:
 	$(DC) build cron
 	sudo chown root:root nextcloud-docker/crontab
 	make -C nextcloud-social-login build
-	# sudo make -C bids-tools build-docker
 	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
 	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
 	docker logout
@@ -69,7 +68,6 @@ build:
 	# TODO echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
 
 build-web:
-	# sudo make -C bids-tools build-docker
 	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
 	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
 	docker logout
@@ -175,7 +173,6 @@ dev-build:
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R www-data:www-data /var/www/html
 	$(DC) -f docker-compose-dev.yml build --no-cache hip
-	# sudo make -C bids-tools build-docker
 	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
 	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
 	docker logout

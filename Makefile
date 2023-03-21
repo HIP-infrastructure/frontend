@@ -21,7 +21,7 @@ install-current-branch: stop build install-nextcloud nextcloud-config install-hi
 	sudo systemctl enable pm2-root
 
 #install: @ * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
-install: update install-current-branch
+install: install-current-branch
 	@echo "production" > .mode
 	@echo WARNING you must have NODE_ENV=production in your .env file
 

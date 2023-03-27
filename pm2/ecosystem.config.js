@@ -25,6 +25,7 @@ module.exports = {
       cwd: relative('..'),
       name: 'gateway',
       watch: relative('gateway/dist/main.js'),
+      args: '--uid www-data --gid www-data',
       env
     },
   ],

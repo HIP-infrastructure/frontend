@@ -21,11 +21,10 @@ module.exports = {
       env
     },
     {
-      script: 'gateway/dist/main.js',
+      script: 'sudo node gateway/dist/main.js',
       cwd: relative('..'),
       name: 'gateway',
       watch: relative('gateway/dist/main.js'),
-      args: '--uid www-data --gid www-data',
       env
     },
   ],

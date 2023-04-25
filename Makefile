@@ -182,7 +182,7 @@ dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-c
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true
 	cp .env gateway/.env
-	@echo "production" > .mode
+	@echo "development" > .mode
 	@echo WARNING you must have NODE_ENV=development in your .env file
 	sudo make -C gateway deploy.dev
 

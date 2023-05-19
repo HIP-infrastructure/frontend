@@ -26,7 +26,7 @@ module.exports = {
     },
     {
       script: gunicorn,
-      args: '--workers 40 --timeout 120 --bind 127.0.0.1:3446 --pythonpath auth_backend auth_backend:app',
+      args: '--workers 5 --timeout 120 --bind 127.0.0.1:3446 --pythonpath auth_backend auth_backend:app',
       name: 'gunicorn_auth_backend',
       cwd: relative('../ghostfs'),
       watch: relative('../ghostfs/auth_backend'),

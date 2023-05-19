@@ -20,7 +20,7 @@ install-current-branch: stop build install-nextcloud nextcloud-config install-hi
 	sudo systemctl start pm2-root
 	sudo systemctl enable pm2-root
 
-#install: @ * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
+#install: Install the latest HIP. Without GhostFS 
 install: install-current-branch
 	@echo "production" > .mode
 	@echo WARNING you must have NODE_ENV=production in your .env file
@@ -115,6 +115,10 @@ install-socialapp:
 #maintenance: @ Enable/disable maintenance mode (make maintenance-on/maintenance-off)	
 maintenance-%:
 	$(OCC) maintenance:mode --$(@:maintenance-%=%)
+
+#dc: @ Run docker-compose (make dc c="ps")
+dc:
+	$(DC) -f docker-compose-dev.yml $(c)
 
 #occ: @ Run occ command (make occ c="status") (make occ c="files:scan --all") etc
 occ:

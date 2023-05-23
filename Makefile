@@ -80,6 +80,12 @@ install-web: maintenance-on build-web install-hipapp maintenance-off
 	sudo pm2 restart gateway
 	sudo pm2 status
 
+install-gateway:
+	cp .env gateway/.env
+	sudo make -C gateway build
+	sudo pm2 restart gateway
+	sudo pm2 status
+
 #start: @ Start all services (-GhostFS)
 start:
 	$(DC) up -d

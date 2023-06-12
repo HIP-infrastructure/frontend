@@ -21,11 +21,12 @@ install-current-branch: stop build install-nextcloud install-web nextcloud-confi
 
 #install: Install the latest HIP. Without GhostFS 
 install: install-current-branch
-	@echo "production" > .mode
-	@echo WARNING you must have NODE_ENV=production in your .env file
+	@echo "**** NODE_ENV=$(NODE_ENV) ****"
+	@echo WARNING you should have NODE_ENV=production in your .env file
 
 #install-ghostfs: @ Stop, update and install GhostFS only
-install-ghostfs: 
+install-ghostfs:
+	echo "AUTH_BACKEND_DOMAIN=${REMOTE_APP_API}" > ghostfs/auth_backend/auth_backend.env      
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	bash ./install_ghostfs.sh
 	$(DC) restart cron
@@ -35,20 +36,16 @@ install-ghostfs:
 #status: @ Show the status of the HIP
 status:
 	@echo "\n"
-	@echo "**** MODE $(shell cat .mode) ****"
-	@echo "\n"
 	sudo pm2 status
 	docker-compose ps
+	@echo "\n"
+	@echo "**** NODE_ENV=$(NODE_ENV) ****"
 
 logs:
 	sudo pm2 logs $(n)
 
 pm2-install: 
 	cd pm2 && npm i && cd ..
-
-update:
-	git pull
-	git submodule update --init --recursive
 
 build: pm2-install build-bids-tools
 	$(DC) build cron
@@ -109,6 +106,7 @@ install-hipapp:
 	$(OCC) app:enable hip
 
 install-socialapp:
+	cd nextcloud-social-login && git checkout hip && cd ..
 	sudo rm -rf $(NC_APP_FOLDER)/sociallogin
 	sudo cp -r ./nextcloud-social-login $(NC_APP_FOLDER)/sociallogin
 	sudo chown -R www-data:www-data $(NC_APP_FOLDER)/sociallogin
@@ -151,6 +149,14 @@ nextcloud-config:
 	$(OCC) app:enable groupfolders
 	$(OCC) app:enable bruteforcesettings
 	$(OCC) app:enable richdocumentscode
+	$(OCC) app:disable dashboard
+	$(OCC) app:disable photos
+	$(OCC) app:disable activity
+	$(OCC) app:disable forms
+
+nextcloud-create-groups:
+	$(OCC) group:add  --display-name CHUV chuv
+	$(OCC) group:add  --display-name CHUV chuv
 
 #nextcloud-dump: @ Dump the current NextCloud DB (Postgres)
 nextcloud-dump:
@@ -165,14 +171,14 @@ sleep-%:
 
 ## Dev
 
-#dev-update: @ Pull and update git submodules to a given branch eg. dev-update branch=dev
-dev-update:
+#update: @ Pull and update git submodules to a given branch eg. update branch=dev
+update:
 	git pull
-	cd hip 						&& git stash && git checkout $(branch) && git pull && cd ..
-	cd gateway 					&& git stash && git checkout $(branch) && git pull && cd ..
-	cd nextcloud-docker 		&& git stash && git checkout $(branch) && git pull && cd ..
-	cd nextcloud-social-login 	&& git stash && git checkout a37f26361689d52a45c5e6521feead23f9d01baf && cd ..
-	# cd ghostfs 					&& git stash && git checkout $(branch) && git pull && cd ..
+	cd hip 										&& git stash && git checkout $(branch) && git pull && cd ..
+	cd gateway 								&& git stash && git checkout $(branch) && git pull && cd ..
+	cd nextcloud-docker 			&& git stash && git checkout $(branch) && git pull && cd ..
+	cd nextcloud-social-login && git stash && git checkout hip && cd ..
+	# cd ghostfs 							&& git stash && git checkout $(branch) && git pull && cd ..
 
 dev-build: build-bids-tools
 	$(DC) build cron
@@ -181,13 +187,13 @@ dev-build: build-bids-tools
 	sudo chown -R www-data:www-data /var/www/html
 	$(DC) -f docker-compose-dev.yml build --no-cache hip
 
-#dev-install: @ Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
+#dev-install: @ Install dev stack for frontend & gateway, use update branch=dev to switch branch, you should have NODE_ENV=development
 dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true
 	cp .env gateway/.env
-	@echo "development" > .mode
-	@echo WARNING you must have NODE_ENV=development in your .env file
+	@echo "**** NODE_ENV=$(NODE_ENV) ****"
+	@echo WARNING you should have NODE_ENV=development in your .env file
 	sudo make -C gateway deploy.dev
 
 #dev-install-gateway: @ Restart the dev gateway

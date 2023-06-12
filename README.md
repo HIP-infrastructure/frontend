@@ -20,7 +20,7 @@ As the package will migrate to K8s, everything is build on the host
 ## Deploy, production
 - Clone this repo, `git clone --recurse-submodules https://github.com/HIP-infrastructure/frontend.git`
 - `cd frontend`
-- `git checkout master`
+- `git checkout master`. You can checkout any branch, and submodules, like dev `make update branch=dev`
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
 - if you are installing with make install, NODE_ENV=production, with make dev-install NODE_ENV=developement
 - If on a local domain, add a choosen local domain name to your `/etc/hosts`
@@ -72,7 +72,7 @@ help:
 
 Change the NODE_ENV to development in the .env file
 
-`make dev-update branch=dev`
+`make update branch=dev`
 `make dev-install`
 
 deploy/reload gateway

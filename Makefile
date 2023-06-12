@@ -7,13 +7,12 @@ export
 .DEFAULT_GOAL := help
 
 NC_DATA_FOLDER=/mnt/nextcloud-dp/nextcloud
-NC_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/apps
-SOCIAL_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/custom_apps/sociallogin
+NC_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/custom_apps
 
 DC=docker-compose --env-file ./.env -f docker-compose.yml
 OCC=docker-compose exec --user www-data cron php occ
 
-install-current-branch: stop build install-nextcloud nextcloud-config install-hipapp install-socialapp
+install-current-branch: stop build install-nextcloud install-web nextcloud-config install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js
 	sudo pm2 save
 	sudo pm2 startup
@@ -69,6 +68,8 @@ build-web:
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
+	sudo pm2 restart gateway
+	sudo pm2 status
 
 #install-web: @ Build & install the webapp and the gateway
 install-web: maintenance-on build-web install-hipapp maintenance-off
@@ -94,7 +95,7 @@ install-nextcloud:
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R www-data:www-data /var/www/html
 	sudo rm -rf ${NC_DATA_FOLDER}/core/skeleton
-	sudo mkdir ${NC_DATA_FOLDER}/core/skeleton
+	sudo mkdir -p ${NC_DATA_FOLDER}/core/skeleton
 	sudo cp hip/skeleton/* ${NC_DATA_FOLDER}/core/skeleton
 	sudo chown -R www-data:www-data ${NC_DATA_FOLDER}/core/skeleton
 	$(DC) up -d
@@ -108,9 +109,9 @@ install-hipapp:
 	$(OCC) app:enable hip
 
 install-socialapp:
-	sudo rm -rf $(SOCIAL_APP_FOLDER)
-	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
-	sudo chown -R www-data:www-data $(SOCIAL_APP_FOLDER)
+	sudo rm -rf $(NC_APP_FOLDER)/sociallogin
+	sudo cp -r ./nextcloud-social-login $(NC_APP_FOLDER)/sociallogin
+	sudo chown -R www-data:www-data $(NC_APP_FOLDER)/sociallogin
 
 ## Utils
 
@@ -219,9 +220,9 @@ dev-hipapp:
 
 dev-socialapp:
 	# make -C nextcloud-social-login build
-	sudo rm -rf $(SOCIAL_APP_FOLDER)
-	sudo cp -r ./nextcloud-social-login $(SOCIAL_APP_FOLDER)
-	sudo chown -R www-data:www-data $(SOCIAL_APP_FOLDER)
+	sudo rm -rf $(NC_APP_FOLDER)/sociallogin
+	sudo cp -r ./nextcloud-social-login $(NC_APP_FOLDER)/sociallogin
+	sudo chown -R www-data:www-data $(NC_APP_FOLDER)/sociallogin
 
 #help:	@ List available tasks on this project
 help:

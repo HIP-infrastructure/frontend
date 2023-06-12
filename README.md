@@ -22,11 +22,14 @@ As the package will migrate to K8s, everything is build on the host
 - `cd frontend`
 - `git checkout master`
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
+- if you are installing with make install, NODE_ENV=production, with make dev-install NODE_ENV=developement
+- If on a local domain, add a choosen local domain name to your `/etc/hosts`
+  - your_ip   hip.local
 
 The first time, you have also to install Nextcloud. 
 
 `cp nextcloud-docker/Caddyfile.template caddy/Caddyfile`
-add your domain name
+- Edit and add your domain name
 
 Create a folder named secrets and add the following txt files to `nextcloud-docker/secrets` :
 - nextcloud_admin_password.txt # put admin password to this file
@@ -35,19 +38,28 @@ Create a folder named secrets and add the following txt files to `nextcloud-dock
 - postgres_password.txt # put postgresql password to this file
 - postgres_user.txt # put postgresql username to this file
 
+- `make install` It will fail.
 - Once Nextcloud is installed, we need to replace the created php-settings by our own in order to parametrize it for docker etc.
-  - `make stop`
   - `sudo rm -rf /mnt/nextcloud-dp/php-settings`
   - `sudo cp -r php-settings /mnt/nextcloud-dp`
+  - `make occ c=maintenance:install`
 - Add some params to the Nextcloud php config in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
     ```
     'htaccess.RewriteBase' => '/',    
     'htaccess.IgnoreFrontController' => true,     
     'defaultapp' => 'hip'  
     ```  
-  
-- `make install`
+
+  if you are local instance with self-signe SSL, add
+```
+  'trusted_domains' => ['hip.local'],
+
+```
+- `make install` again
 - Open your browser to your ip or hostname
+
+- next steps:
+  - Configure sociallogin
 
 to stop 
 `make stop`

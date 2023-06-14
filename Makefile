@@ -6,9 +6,6 @@ export
 
 .DEFAULT_GOAL := help
 
-NC_DATA_FOLDER=/mnt/nextcloud-dp/nextcloud
-NC_APP_FOLDER=/mnt/nextcloud-dp/nextcloud/custom_apps
-
 DC=docker-compose --env-file ./.env -f docker-compose.yml
 OCC=docker-compose exec --user www-data cron php occ
 
@@ -155,7 +152,6 @@ nextcloud-config:
 	$(OCC) app:disable forms
 
 nextcloud-create-groups:
-	$(OCC) group:add  --display-name CHUV chuv
 	$(OCC) group:add  --display-name CHUV chuv
 
 #nextcloud-dump: @ Dump the current NextCloud DB (Postgres)

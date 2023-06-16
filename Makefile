@@ -68,6 +68,11 @@ build-web:
 #install-web: @ Build & install the webapp and the gateway
 install-web: maintenance-on build-web install-hipapp maintenance-off
 
+build-ui:
+	sudo make -C hip build
+
+install-ui: build-web install-hipapp
+
 install-gateway:
 	cp .env gateway/.env
 	sudo make -C gateway build

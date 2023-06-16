@@ -1,0 +1,35 @@
+{
+  "license": "Apache-2.0",
+  "keywords": [
+    "ieeg-data",
+    "mri-data",
+    "ct-data",
+    "bids",
+    "docker",
+    "nextcloud"
+  ],
+  "creators": [
+    {
+      "name": "Spuhler, Manuel",
+      "affiliation": "Centre Hospitalier Universitaire Vaudois and University of Lausanne (CHUV-UNIL), Switzerland"
+    },
+    {
+      "name": "Tourbier, Sebastien",
+      "affiliation": "Centre Hospitalier Universitaire Vaudois and University of Lausanne (CHUV-UNIL), Switzerland"
+    },
+    {
+      "name": "Casati, Nathalie",
+      "affiliation": "Centre Hospitalier Universitaire Vaudois and University of Lausanne (CHUV-UNIL), Switzerland"
+    },
+    {
+      "name": "Schaffhauser, Birgit",
+      "affiliation": "Centre Hospitalier Universitaire Vaudois and University of Lausanne (CHUV-UNIL), Switzerland"
+    },
+    {
+      "name": "Ryvlin, Philippe",
+      "affiliation": "Centre Hospitalier Universitaire Vaudois and University of Lausanne (CHUV-UNIL), Switzerland"
+    }
+  ],
+  "access_right": "open",
+  "upload_type": "software"
+}

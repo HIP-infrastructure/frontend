@@ -44,7 +44,7 @@ logs:
 pm2-install: 
 	cd pm2 && npm i && cd ..
 
-build: pm2-install build-bids-tools
+build: pm2-install build-datahipy
 	$(DC) build cron
 	sudo chown root:root nextcloud-docker/crontab
 	make -C nextcloud-social-login build
@@ -53,9 +53,9 @@ build: pm2-install build-bids-tools
 	sudo make -C hip build
 	# TODO echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf; sudo sysctl -p
 
-build-bids-tools:
+build-datahipy:
 	docker login $(GL_REGISTRY) -u $(GL_USER) -p $(GL_TOKEN)
-	docker pull $(GL_REGISTRY)/$(BIDS_TOOLS_IMAGE):$(BIDS_TOOLS_VERSION)
+	docker pull $(GL_REGISTRY)/$(DataHIPy_IMAGE):$(DataHIPy_VERSION)
 	docker logout
 
 build-web:
@@ -176,7 +176,7 @@ update:
 	cd nextcloud-social-login && git stash && git checkout hip && cd ..
 	# cd ghostfs 							&& git stash && git checkout $(branch) && git pull && cd ..
 
-dev-build: build-bids-tools
+dev-build: build-datahipy
 	$(DC) build cron
 	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true

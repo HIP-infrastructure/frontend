@@ -11,7 +11,6 @@
 	path = nextcloud-social-login
 	url = https://github.com/HIP-infrastructure/nextcloud-social-login
 	branch = feat/oidc-username-claim
-
 [submodule "ghostfs"]
 	path = ghostfs
 	url = git@github.com:HIP-infrastructure/ghostfs.git

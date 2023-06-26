@@ -71,7 +71,7 @@ install-web: maintenance-on build-web install-hipapp maintenance-off
 build-ui:
 	sudo make -C hip build
 
-install-ui: build-web install-hipapp
+install-ui: build-ui install-hipapp
 
 install-gateway:
 	cp .env gateway/.env

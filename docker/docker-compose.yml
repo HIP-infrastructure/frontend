@@ -1,0 +1,22 @@
+version: '3.2'
+
+services:
+  front:
+    image: local/hip:installed
+    stdin_open: true
+    #tty: true
+    entrypoint: /bin/bash
+    volumes:
+      - ..:/home/localadmin/chuv/hip/frontend
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/nextcloud-dp:/mnt/nextcloud-dp
+    ports:
+      - "11443:443"
+      - "1180:80"
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    name: frontend
+    driver: bridge

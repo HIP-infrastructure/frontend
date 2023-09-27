@@ -6,15 +6,15 @@ export
 
 .DEFAULT_GOAL := help
 
-DC=docker-compose --env-file ./.env -f docker-compose.yml
-OCC=docker-compose exec --user www-data cron php occ
+DC=docker compose --env-file ./.env -f docker-compose.yml
+OCC=docker compose exec --user www-data cron php occ
 
 install-current-branch: stop build install-nextcloud install-web nextcloud-config install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js
 	sudo pm2 save
 	sudo pm2 startup
-	sudo systemctl start pm2-root
-	sudo systemctl enable pm2-root
+	sudo systemctl start pm2-root || true
+	sudo systemctl enable pm2-root || true
 
 #install: Install the latest HIP. Without GhostFS 
 install: install-current-branch
@@ -42,6 +42,7 @@ logs:
 	sudo pm2 logs $(n)
 
 pm2-install: 
+	sudo npm i -g pm2
 	cd pm2 && npm i && cd ..
 
 build: pm2-install build-datahipy
@@ -62,7 +63,7 @@ build-web:
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo make -C hip build
-	sudo pm2 restart gateway
+	sudo pm2 restart gateway || true
 	sudo pm2 status
 
 #install-web: @ Build & install the webapp and the gateway
@@ -76,7 +77,7 @@ install-ui: build-ui install-hipapp
 install-gateway:
 	cp .env gateway/.env
 	sudo make -C gateway build
-	sudo pm2 restart gateway
+	sudo pm2 restart gateway || true
 	sudo pm2 status
 
 #start: @ Start all services (-GhostFS)
@@ -85,7 +86,7 @@ start:
 	sudo pm2 start pm2/ecosystem.config.js
 
 #stop: @ Stop all services (-GhostFS)
-stop: dev-stop
+stop: pm2-install dev-stop
 	$(DC) stop
 	sudo pm2 stop pm2/ecosystem.config.js
 

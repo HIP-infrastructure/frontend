@@ -6,8 +6,8 @@ export
 
 .DEFAULT_GOAL := help
 
-DC=docker-compose --env-file ./.env -f docker-compose.yml
-OCC=docker-compose exec --user www-data cron php occ
+DC=docker compose --env-file ./.env -f docker-compose.yml
+OCC=docker compose exec --user www-data cron php occ
 
 install-current-branch: stop build install-nextcloud install-web nextcloud-config install-socialapp
 	sudo pm2 start pm2/ecosystem.config.js

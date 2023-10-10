@@ -63,7 +63,7 @@ sudo chgrp www-data ghostfs/key.pem ghostfs/cert.pem
 sudo chmod 640 ghostfs/*.pem
 
 rm -f ghostfs/GhostFS
-wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-${GHOSTFS_VERSION}/GhostFS -O ghostfs/GhostFS
+wget https://github.com/pouya-eghbali/ghostfs-builds/releases/download/linux-ubuntu-22.04-${GHOSTFS_VERSION}/GhostFS -O ghostfs/GhostFS
 chmod +x ghostfs/GhostFS
 echo `./ghostfs/GhostFS --version`
 

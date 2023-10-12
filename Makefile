@@ -26,6 +26,7 @@ install: require stop install-nextcloud install-web install-socialapp build-data
 
 #install-ghostfs: @ Stop, update and install GhostFS only
 install-ghostfs: require
+	cd pm2 && npm i && cd ..
 	echo "AUTH_BACKEND_DOMAIN=${REMOTE_APP_API}" > ghostfs/auth_backend/auth_backend.env      
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	bash ./install_ghostfs.sh

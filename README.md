@@ -25,6 +25,7 @@ As the package will migrate to K8s, everything is build on the host
 ### First time install 
 - install all the dependencies by calling
 - `./hip-required_ubuntu-22.04.sh`
+- You might want to logout and login again, in order to gain access to the docker command for your current user
 
 #### GhostFS
 - a distributed file system tailored to the HIP
@@ -58,6 +59,7 @@ Create a folder named secrets and add the following txt files to `nextcloud-dock
 - `make install`
 - Open your browser to your ip or hostname
 - Access NextCloud with admin/[nextcloud_admin_password.txt]
+- NextCloud could complain about Access through untrusted domain, and in that case, re-add your domain to the `/mnt/nextcloud-dp/nextcloud/config/config.php` file again. This yhould fix it. 
 
 #### Social-login app, OIDC client, groups
 Social login is a Nextcloud app, customized for our need, helping the OIDC login process for users.

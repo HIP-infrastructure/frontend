@@ -30,6 +30,8 @@ As the package will migrate to K8s, everything is build on the host
 #### GhostFS
 - a distributed file system tailored to the HIP
 - `make install-ghostfs`
+- You will need to provide a user/password for the server, that you will need to install on the [backend](https://github.com/HIP-infrastructure/app-in-browser#configuring-app-in-browser))
+- pm2 cannot start ghostfs at this time, as Nextcloud data storage doesn't exist yet. A pm2 error for the service is ok at this time. 
 
 #### Nextcloud
 
@@ -59,7 +61,8 @@ Create a folder named secrets and add the following txt files to `nextcloud-dock
 - `make install`
 - Open your browser to your ip or hostname
 - Access NextCloud with admin/[nextcloud_admin_password.txt]
-- NextCloud could complain about Access through untrusted domain, and in that case, re-add your domain to the `/mnt/nextcloud-dp/nextcloud/config/config.php` file again. This yhould fix it. 
+- NextCloud could complain about Access through untrusted domain, and in that case, re-add your domain to the `/mnt/nextcloud-dp/nextcloud/config/config.php` file again. This yhould fix it.
+- sudo pm2 restart all to restart ghostfs
 
 #### Social-login app, OIDC client, groups
 Social login is a Nextcloud app, customized for our need, helping the OIDC login process for users.

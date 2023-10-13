@@ -35,7 +35,7 @@ As the package will migrate to K8s, everything is build on the host
 
 #### Nextcloud
 
-if you want to migrate an existing install to a new location, here are a few tips [Nextcloud-migration.md](./Nextcloud-migration.md/)]
+if you want to migrate an existing install to a new location, here are a few tips [Nextcloud-migration.md](https://github.com/HIP-infrastructure/frontend/blob/master/Nextcloud-Migration.md)
 
 Create a folder named secrets and add the following txt files to `nextcloud-docker/secrets` :
 - nextcloud_admin_password.txt # put admin password to this file

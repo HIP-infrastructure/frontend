@@ -207,11 +207,11 @@ dev-stop-gateway:
 	./stop_gateway.sh
 
 dev-stop: dev-stop-gateway
-	$(DC) -f docker-compose-dev.yml -f docker-compose-dev.yml stop
+	$(DC) -f docker-compose-dev.yml stop
 	sudo pm2 stop pm2/ecosystem.dev.config.js
 
 dev-up:
-	$(DC) -f docker-compose-dev.yml -f docker-compose-dev.yml up -d
+	$(DC) -f docker-compose-dev.yml up -d
 
 dev-hipapp:
 	sudo mkdir -p $(NC_APP_FOLDER)/hip/templates

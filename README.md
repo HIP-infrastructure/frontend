@@ -13,25 +13,29 @@ The install is based on make and git submodules.
 As the package will migrate to K8s, everything is build on the host 
 
 ### Prerequisite
-- Ubuntu 20.04
-- Make sure you have [docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04) and docker-compose installed
-- Install `make`: `sudo apt install build-essential`
+- Ubuntu 22.04
 
 ## Deploy, production
 - Clone this repo, `git clone --recurse-submodules https://github.com/HIP-infrastructure/frontend.git`
 - `cd frontend`
-- `git checkout master`. You can checkout any branch, and submodules, like dev `make update branch=dev`
+- `git checkout master`
+- You can checkout the submodules to the desired branch, default is the latest version
 - Copy `.env.template` to `.env` and edit the variables according to your needs.
-- if you are installing with make install, NODE_ENV=production, with make dev-install NODE_ENV=developement
-- If on a local domain, add a choosen local domain name to your `/etc/hosts`
-  - your_ip   hip.local
 
 ### First time install 
+- install all the dependencies by calling
+- `./hip-required_ubuntu-22.04.sh`
+- You might want to logout and login again, in order to gain access to the docker command for your current user
+
+#### GhostFS
+- a distributed file system tailored to the HIP
+- `make install-ghostfs`
+- You will need to provide a user/password for the server, that you will need to install on the [backend](https://github.com/HIP-infrastructure/app-in-browser#configuring-app-in-browser))
+- pm2 cannot start ghostfs at this time, as Nextcloud data storage doesn't exist yet. A pm2 error for the service is ok at this time. 
 
 #### Nextcloud
 
-`cp nextcloud-docker/Caddyfile.template caddy/Caddyfile`
-- Edit and add your domain name
+if you want to migrate an existing install to a new location, here are a few tips [Nextcloud-migration.md](https://github.com/HIP-infrastructure/frontend/blob/master/Nextcloud-Migration.md)
 
 Create a folder named secrets and add the following txt files to `nextcloud-docker/secrets` :
 - nextcloud_admin_password.txt # put admin password to this file
@@ -40,30 +44,27 @@ Create a folder named secrets and add the following txt files to `nextcloud-dock
 - postgres_password.txt # put postgresql password to this file
 - postgres_user.txt # put postgresql username to this file
 
-- `make install` Nextcloud will fail. Don't bother
+- `make install-nextcloud` Nextcloud will fail. Don't bother
 - Once Nextcloud is installed, we need to replace the created php-settings by our own in order to parametrize it for docker etc.
   - `sudo rm -rf /mnt/nextcloud-dp/php-settings`
   - `sudo cp -r php-settings /mnt/nextcloud-dp`
 
-- `make install` It will fail, again. 
+- `make install-nextcloud` It will fail, again. 
   - `make occ c=maintenance:install`
-  - The new NC install asks fo a password for admin, use the one provided in secrets in [nextcloud_admin_password.txt]
+  - Nextcloud install asks fo a password for admin, use the one provided in secrets in [nextcloud_admin_password.txt]
 
 - Add some params to the Nextcloud php config in  `/mnt/nextcloud-dp/nextcloud/config/config.php`
-    ```
+```
     'htaccess.RewriteBase' => '/',    
     'htaccess.IgnoreFrontController' => true,     
-    'defaultapp' => 'hip'  
-    ```  
-
-  if you are local instance with self-signe SSL, add
+    'defaultapp' => 'hip',
+    'trusted_domains' => ['hip.local'],
 ```
-  'trusted_domains' => ['hip.local'],
-
-```
-- `make install` again
+- `make install`
 - Open your browser to your ip or hostname
 - Access NextCloud with admin/[nextcloud_admin_password.txt]
+- NextCloud could complain about Access through untrusted domain, and in that case, re-add your domain to the `/mnt/nextcloud-dp/nextcloud/config/config.php` file again. This yhould fix it.
+- sudo pm2 restart all to restart ghostfs
 
 #### Social-login app, OIDC client, groups
 Social login is a Nextcloud app, customized for our need, helping the OIDC login process for users.
@@ -109,7 +110,6 @@ Save everything, logout, and try to login with your EBBRAINS credentials
 
 Change the NODE_ENV to development in the .env file
 
-`make update branch=dev`
 `make dev-install`
 
 deploy/reload gateway

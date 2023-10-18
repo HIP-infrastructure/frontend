@@ -9,7 +9,12 @@ export
 DC=docker compose --env-file ./.env -f docker-compose.yml
 OCC=docker compose exec --user www-data cron php occ
 
-install-current-branch: stop build install-nextcloud install-web nextcloud-config install-socialapp
+require:
+	@echo "Checking the programs required for the build are installed..."
+	@make --version >/dev/null 2>&1 || (echo -e "\033[31mERROR: make is required. (sudo apt install -y build-essential)"; exit 1)
+	./hip-required_ubuntu-22.04.sh
+
+pm2: 
 	sudo pm2 start pm2/ecosystem.config.js
 	sudo pm2 save
 	sudo pm2 startup
@@ -17,12 +22,11 @@ install-current-branch: stop build install-nextcloud install-web nextcloud-confi
 	sudo systemctl enable pm2-root || true
 
 #install: Install the latest HIP. Without GhostFS 
-install: install-current-branch
-	@echo "**** NODE_ENV=$(NODE_ENV) ****"
-	@echo WARNING you should have NODE_ENV=production in your .env file
+install: require stop install-nextcloud install-web install-socialapp build-datahipy nextcloud-config pm2
 
 #install-ghostfs: @ Stop, update and install GhostFS only
-install-ghostfs:
+install-ghostfs: require
+	cd pm2 && npm i && cd ..
 	echo "AUTH_BACKEND_DOMAIN=${REMOTE_APP_API}" > ghostfs/auth_backend/auth_backend.env      
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	bash ./install_ghostfs.sh
@@ -61,9 +65,10 @@ build-datahipy:
 
 build-web:
 	cp .env gateway/.env
-	sudo make -C gateway build
-	sudo make -C hip build
-	sudo pm2 restart gateway || true
+	make -C gateway build
+	make -C hip build
+	sudo pm2 start pm2/ecosystem.config.js
+	sudo pm2 restart gateway
 	sudo pm2 status
 
 #install-web: @ Build & install the webapp and the gateway
@@ -91,6 +96,7 @@ stop: pm2-install dev-stop
 	sudo pm2 stop pm2/ecosystem.config.js
 
 install-nextcloud:
+	$(DC) stop
 	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R www-data:www-data /var/www/html
@@ -98,6 +104,8 @@ install-nextcloud:
 	sudo mkdir -p ${NC_DATA_FOLDER}/core/skeleton
 	sudo cp hip/skeleton/* ${NC_DATA_FOLDER}/core/skeleton
 	sudo chown -R www-data:www-data ${NC_DATA_FOLDER}/core/skeleton
+	$(DC) build cron
+	sudo chown root:root nextcloud-docker/crontab
 	$(DC) up -d
 
 install-hipapp:
@@ -113,6 +121,7 @@ install-socialapp:
 	sudo rm -rf $(NC_APP_FOLDER)/sociallogin
 	sudo cp -r ./nextcloud-social-login $(NC_APP_FOLDER)/sociallogin
 	sudo chown -R www-data:www-data $(NC_APP_FOLDER)/sociallogin
+	$(OCC) app:enable sociallogin
 
 ## Utils
 
@@ -145,10 +154,7 @@ nextcloud-upgrade:
 
 nextcloud-config:
 	$(OCC) app:enable hip
-	$(OCC) app:enable user_status
 	$(OCC) app:enable sociallogin
-	$(OCC) app:enable spreed
-	$(OCC) app:enable forms
 	$(OCC) app:enable groupfolders
 	$(OCC) app:enable bruteforcesettings
 	$(OCC) app:enable richdocumentscode
@@ -156,6 +162,8 @@ nextcloud-config:
 	$(OCC) app:disable photos
 	$(OCC) app:disable activity
 	$(OCC) app:disable forms
+	$(OCC) app:disable spreed
+	$(OCC) app:disable user_status
 
 nextcloud-create-groups:
 	$(OCC) group:add  --display-name CHUV chuv
@@ -164,23 +172,10 @@ nextcloud-create-groups:
 nextcloud-dump:
 	$(DC) exec db pg_dump -U hipadmin nextcloud_db > $(shell date +%Y%m%d_%H%M%S).dump
 
-lazydocker:
-	[ ! -f ~/.local/bin/lazydocker ] && (curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash) || true
-	~/.local/bin/lazydocker
-
 sleep-%:
 	sleep $(@:sleep-%=%)
 
 ## Dev
-
-#update: @ Pull and update git submodules to a given branch eg. update branch=dev
-update:
-	git pull
-	cd hip 										&& git stash && git checkout $(branch) && git pull && cd ..
-	cd gateway 								&& git stash && git checkout $(branch) && git pull && cd ..
-	cd nextcloud-docker 			&& git stash && git checkout $(branch) && git pull && cd ..
-	cd nextcloud-social-login && git stash && git checkout hip && cd ..
-	# cd ghostfs 							&& git stash && git checkout $(branch) && git pull && cd ..
 
 dev-build: build-datahipy
 	$(DC) build cron
@@ -196,12 +191,12 @@ dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-c
 	cp .env gateway/.env
 	@echo "**** NODE_ENV=$(NODE_ENV) ****"
 	@echo WARNING you should have NODE_ENV=development in your .env file
-	sudo make -C gateway deploy.dev
+	make -C gateway deploy.dev
 
 #dev-install-gateway: @ Restart the dev gateway
 dev-install-gateway: dev-stop-gateway sleep-5
 	cp .env gateway/.env
-	sudo make -C gateway deploy.dev
+	make -C gateway deploy.dev
 
 dev-install-frontend:
 	$(DC) -f docker-compose-dev.yml build --no-cache hip

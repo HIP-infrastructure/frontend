@@ -55,8 +55,10 @@ services:
       - postgres_password
       - postgres_user
     networks: &nextcloud_net
-      - backend
-      - frontend
+      backend:
+      frontend:
+        aliases:
+        - appnextcloud
 
   cron:
     container_name: cron

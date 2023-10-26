@@ -1,58 +1,82 @@
-{$HOSTNAME_SCHEME}://{$HOSTNAME}
+https://keycloak.demo.horus-analytics.chuv.ch {
 
-encode gzip zstd
+	encode gzip zstd
+	tls /data/docker/acme.sh/certs/acme/keycloak.demo.horus-analytics.chuv.ch/fullchain.cer /data/docker/acme.sh/certs/acme/keycloak.demo.horus-analytics.chuv.ch/keycloak.demo.horus-analytics.chuv.ch.key
 
-#tls /etc/caddy/cert.pem /etc/caddy/key.pem
-
-log {
-	output file /var/log/nextcloud.log
-	level DEBUG
-}
-
-handle /api/v1/* {
-	reverse_proxy {$GATEWAY_REVERSE_PROXY}
-}
-
-# global nextcloud config
-root * /var/www/html
-file_server
-php_fastcgi /* app:9000
-
-header {
-	# enable HSTS
-	Strict-Transport-Security max-age=31536000;
-}
-
-redir /.well-known/carddav /remote.php/dav 301
-redir /.well-known/caldav /remote.php/dav 301
-
-# ghostfs
-redir /fs /fs/
-route /fs/* {
-	uri strip_prefix /fs
-	reverse_proxy localhost:3446 {
-		health_uri /ok
-		health_interval 10s
-
-		header_up Host {host}
-		header_up X-Real-IP {remote_host}
-		header_up X-Forwarded-For {remote_host}
+	log {
+		output file /var/log/keycloak.log
+		level DEBUG
 	}
+
+	handle /* {
+		reverse_proxy http://localhost:8080
+	}
+
 }
 
-# .htaccess / data / config / ... shouldn't be accessible from outside
-@forbidden {
-	path /.htaccess
-	path /data/*
-	path /config/*
-	path /db_structure
-	path /.xml
-	path /README
-	path /3rdparty/*
-	path /lib/*
-	path /templates/*
-	path /occ
-	path /console.php
+{$HOSTNAME_SCHEME}://{$HOSTNAME} {
+
+
+	encode gzip zstd
+
+	tls /data/docker/acme.sh/certs/acme/demo.horus-analytics.chuv.ch/fullchain.cer /data/docker/acme.sh/certs/acme/demo.horus-analytics.chuv.ch/demo.horus-analytics.chuv.ch.key
+
+	log {
+		output file /var/log/nextcloud.log
+		level DEBUG
+	}
+
+	handle /api/v1/* {
+		reverse_proxy {$GATEWAY_REVERSE_PROXY}
+	}
+
+	handle /session/* {
+		reverse_proxy {$REMOTE_APP_REVERSE_PROXY}
+	}
+
+	# global nextcloud config
+	root * /var/www/html
+	file_server
+	php_fastcgi /* localhost:9000
+
+	header {
+		# enable HSTS
+		Strict-Transport-Security max-age=31536000;
+	}
+
+	redir /.well-known/carddav /remote.php/dav 301
+	redir /.well-known/caldav /remote.php/dav 301
+
+	# ghostfs
+	redir /fs /fs/
+	route /fs/* {
+		uri strip_prefix /fs
+		reverse_proxy localhost:3446 {
+			health_uri /ok
+			health_interval 10s
+
+			header_up Host {host}
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+		}
+	}
+
+	# .htaccess / data / config / ... shouldn't be accessible from outside
+	@forbidden {
+		path /.htaccess
+		path /data/*
+		path /config/*
+		path /db_structure
+		path /.xml
+		path /README
+		path /3rdparty/*
+		path /lib/*
+		path /templates/*
+		path /occ
+		path /console.php
+	}
+
+	respond @forbidden 404
+
 }
 
-respond @forbidden 404

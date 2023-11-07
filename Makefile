@@ -62,15 +62,16 @@ build-web:
 install-web: maintenance-on build-web install-hipapp maintenance-off
 
 build-ui:
-	sudo make -C hip build
+	make -C hip build
 
 install-ui: build-web install-hipapp
 
 install-gateway:
 	cp .env gateway/.env
 	make -C gateway build
-	sudo pm2 restart gateway
-	sudo pm2 status
+
+	pm2 restart gateway || true
+	pm2 status
 
 #start: @ Start all services (-GhostFS)
 start:

@@ -4,13 +4,6 @@
 [submodule "gateway"]
 	path = gateway
 	url = git@github.com:HIP-infrastructure/gateway
-[submodule "nextcloud-docker"]
-	path = nextcloud-docker
-	url = git@github.com:HIP-infrastructure/nextcloud-docker
-[submodule "nextcloud-social-login"]
-	path = nextcloud-social-login
-	url = https://github.com/HIP-infrastructure/nextcloud-social-login
-	branch = feat/oidc-username-claim
 [submodule "ghostfs"]
 	path = ghostfs
 	url = git@github.com:HIP-infrastructure/ghostfs.git

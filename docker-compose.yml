@@ -1,93 +1,6 @@
 version: '3.2'
 
 services:
-  db:
-    container_name: db
-    hostname: db
-    image: postgres:${POSTGRES_VERSION}
-    restart: always
-    ports:
-      - 127.0.0.1:5432:5432
-    volumes:
-      - ./nextcloud-docker/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB_FILE=/run/secrets/postgres_db
-      - POSTGRES_USER_FILE=/run/secrets/postgres_user
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-    secrets:
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    networks:
-      - backend
-      - frontend
-
-  app:
-    container_name: app
-    hostname: app
-    image: nextcloud:${NEXTCLOUD_VERSION}
-    restart: always
-    ports:
-      - 127.0.0.1:9000:9000
-    volumes: &nextcloud_vol
-      - /mnt/nextcloud-dp/nextcloud:/var/www/html
-      - /mnt/nextcloud-dp/php-settings:/usr/local/etc
-      - ./nextcloud-docker/crontab:/var/spool/cron/crontabs/www-data:ro
-      #- ./secrets/redis_password.txt:/run/secrets/redis_password
-    environment: &nextcloud_env
-      - POSTGRES_HOST=db
-      - POSTGRES_DB_FILE=/run/secrets/postgres_db
-      - POSTGRES_USER_FILE=/run/secrets/postgres_user
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
-      - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/nextcloud_admin_password
-      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/nextcloud_admin_user
-      - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
-      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
-      - REDIS_HOST=redis
-      #- REDIS_HOST_PASSWORD=/run/secrets/redis_password
-    depends_on: &nextcloud_dep
-      - db
-      - redis
-    secrets:
-      - nextcloud_admin_password
-      - nextcloud_admin_user
-      - postgres_db
-      - postgres_password
-      - postgres_user
-    networks: &nextcloud_net
-      - backend
-      - frontend
-
-  cron:
-    container_name: cron
-    hostname: cron
-    build:
-     context: ./nextcloud-docker/nextcloud
-     args:
-      - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION}
-    restart: always
-    volumes: *nextcloud_vol
-    environment: *nextcloud_env
-    depends_on: *nextcloud_dep
-    networks: *nextcloud_net
-    entrypoint: ['/usr/bin/supervisord', '-c', '/supervisord.conf']
-
-  redis:
-    container_name: redis
-    hostname: redis
-    image: redis:latest
-    #environment:
-    #  - REDIS_HOST_PASSWORD=/run/secrets/redis_password
-    #command: bash -c '[ "$$REDIS_HOST_PASSWORD" ] &&
-    #  ( cat "$$REDIS_HOST_PASSWORD" | xargs redis-server --appendonly yes --requirepass)' #|| redis-server --appendonly yes'
-    command: redis-server --appendonly yes
-    restart: always
-    volumes:
-      - ./nextcloud-docker/redis/data:/data
-    #  - ./secrets/redis_password.txt:/run/secrets/redis_password
-    networks:
-      - backend
-
   cache:
     container_name: cache
     hostname: cache
@@ -108,18 +21,4 @@ networks:
     #   com.docker.network.driver.mtu: 1450
   backend:
     internal: true
-
-secrets:
-  nextcloud_admin_password:
-    file: ./nextcloud-docker/secrets/nextcloud_admin_password.txt # put admin password to this file
-  nextcloud_admin_user:
-    file: ./nextcloud-docker/secrets/nextcloud_admin_user.txt # put admin username to this file
-  postgres_db:
-    file: ./nextcloud-docker/secrets/postgres_db.txt # put postgresql db name to this file
-  postgres_password:
-    file: ./nextcloud-docker/secrets/postgres_password.txt # put postgresql password to this file
-  postgres_user:
-    file: ./nextcloud-docker/secrets/postgres_user.txt # put postgresql username to this file
-  #  redis_password:
-    #file: ./secrets/redis_password.txt  # put redis password to this file
 

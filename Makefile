@@ -7,7 +7,7 @@ export
 .DEFAULT_GOAL := help
 
 DC=docker compose --env-file ./.env -f docker-compose.yml
-OCC=docker compose exec --user www-data cron php occ
+OCC=docker exec --user www-data cron php occ
 
 require:
 	@echo "Checking the programs required for the build are installed..."
@@ -30,7 +30,6 @@ install-ghostfs: require
 	echo "AUTH_BACKEND_DOMAIN=${REMOTE_APP_API}" > ghostfs/auth_backend/auth_backend.env      
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	bash ./install_ghostfs.sh
-	$(DC) restart cron
 	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 	sudo pm2 save
 
@@ -51,6 +50,7 @@ build-datahipy:
 	docker logout
 
 build-web:
+	$(DC) up -d
 	cp .env gateway/.env
 	make -C gateway build
 	make -C hip build
@@ -67,9 +67,9 @@ build-ui:
 install-ui: build-web install-hipapp
 
 install-gateway:
+	$(DC) up -d
 	cp .env gateway/.env
 	make -C gateway build
-
 	pm2 restart gateway || true
 	pm2 status
 
@@ -80,7 +80,6 @@ start:
 
 #stop: @ Stop all services (-GhostFS)
 stop: dev-stop
-	$(DC) stop
 	sudo pm2 stop pm2/ecosystem.config.js
 
 install-hipapp:
@@ -106,9 +105,7 @@ sleep-%:
 
 ## Dev
 
-dev-build: build-datahipy
-	$(DC) build cron
-	sudo mkdir -p /var/www
+dev-build: build-datahipy	sudo mkdir -p /var/www
 	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
 	sudo chown -R www-data:www-data /var/www/html
 	$(DC) -f docker-compose-dev.yml build --no-cache hip
@@ -136,7 +133,7 @@ dev-stop-gateway:
 	./stop_gateway.sh
 
 dev-stop: dev-stop-gateway
-	$(DC) -f docker-compose-dev.yml -f docker-compose-dev.yml stop
+	$(DC) -f docker-compose-dev.yml stop
 	sudo pm2 stop pm2/ecosystem.dev.config.js
 
 dev-up:

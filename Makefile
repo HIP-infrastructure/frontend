@@ -90,6 +90,49 @@ install-hipapp:
 	sudo chown -R www-data:www-data $(NC_APP_FOLDER)
 	$(OCC) app:enable hip
 
+configure-nextcloud:
+	sudo mkdir -p /var/www
+	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
+	sudo chown -R www-data:www-data /var/www/html
+	sudo rm -rf ${NC_DATA_FOLDER}/core/skeleton
+	sudo mkdir -p ${NC_DATA_FOLDER}/core/skeleton
+	sudo cp hip/skeleton/* ${NC_DATA_FOLDER}/core/skeleton
+	sudo chown -R www-data:www-data ${NC_DATA_FOLDER}/core/skeleton
+	sudo chown root:root crontab
+
+#occ: @ Run occ command (make occ c="status") (make occ c="files:scan --all") etc
+occ:
+	$(OCC) $(c)
+
+#nextcloud-repair: @ Attempt to repair NextCloud
+nextcloud-repair: nextcloud-upgrade
+	$(OCC) maintenance:repair
+	$(OCC) files:scan --all
+	$(OCC) files:cleanup 
+
+#nextcloud-upgrade: @ Upgrade NextCloud
+nextcloud-upgrade:
+	$(OCC) upgrade
+	$(OCC) maintenance:mimetype:update-db
+	$(OCC) maintenance:mimetype:update-js 
+	$(OCC) db:add-missing-columns
+	$(OCC) db:add-missing-indices
+	$(OCC) db:add-missing-primary-keys
+
+nextcloud-config:
+	$(OCC) app:enable hip
+	$(OCC) app:enable sociallogin
+	$(OCC) app:enable groupfolders
+	$(OCC) app:enable bruteforcesettings
+	$(OCC) app:enable richdocumentscode
+	$(OCC) app:enable sharingpath
+	$(OCC) app:disable dashboard
+	$(OCC) app:disable photos
+	$(OCC) app:disable activity
+	$(OCC) app:disable forms
+	$(OCC) app:disable spreed
+	$(OCC) app:disable user_status
+	
 ## Utils
 
 #maintenance: @ Enable/disable maintenance mode (make maintenance-on/maintenance-off)	

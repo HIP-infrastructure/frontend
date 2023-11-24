@@ -11,7 +11,11 @@ As the package will migrate to K8s, everything is build on the host
 
 ### Prerequisite
 - Ubuntu 22.04
+- A Keycloak instance 
+  - as in https://github.com/HIP-infrastructure/keycloak 
+  - as well as the collab backend `install_keycloak_backend.sh`
 - Nextcloud 24.0.x installed, as in [Nextcloud install](https://github.com/HIP-infrastructure/nextcloud-docker)
+- Configured Nextcloud for the HIP: [NextcloudConfig.md)](NextcloudConfig.md)
 
 ## Deploy, production
 - Clone this repo, `git clone --recurse-submodules https://github.com/HIP-infrastructure/frontend.git`

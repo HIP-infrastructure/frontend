@@ -70,8 +70,8 @@ install-gateway:
 	$(DC) up -d
 	cp .env gateway/.env
 	make -C gateway build
-	pm2 restart gateway || true
-	pm2 status
+	sudo pm2 restart gateway || true
+	sudo pm2 status
 
 #start: @ Start all services (-GhostFS)
 start:

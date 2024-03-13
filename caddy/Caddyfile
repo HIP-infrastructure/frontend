@@ -4,6 +4,22 @@ encode gzip zstd
 
 #tls /etc/caddy/cert.pem /etc/caddy/key.pem
 
+root * /var/www/html
+file_server
+log {
+	output file     /var/log/nextcloud.log
+	format single_field common_log
+}
+php_fastcgi app:9000
+
+header {
+        # enable HSTS
+        Strict-Transport-Security max-age=31536000;
+}
+
+redir /.well-known/carddav /remote.php/dav 301
+redir /.well-known/caldav /remote.php/dav 301
+
 handle /api/v1/* {
 	reverse_proxy {$GATEWAY_REVERSE_PROXY}
 }

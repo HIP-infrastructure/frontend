@@ -1,9 +1,9 @@
 [submodule "hip"]
 	path = hip
-	url = git@github.com:HIP-infrastructure/hip
+	url = https://github.com/HIP-infrastructure/hip
 [submodule "gateway"]
 	path = gateway
-	url = git@github.com:HIP-infrastructure/gateway
+	url = https://github.com/HIP-infrastructure/gateway
 [submodule "ghostfs"]
 	path = ghostfs
-	url = git@github.com:HIP-infrastructure/ghostfs.git
+	url = https://github.com/HIP-infrastructure/ghostfs

@@ -33,6 +33,19 @@ install-ghostfs: require
 	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 	sudo pm2 save
 
+install-nextcloud:
+	$(DC) stop || true
+	sudo mkdir -p /var/www
+	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
+	sudo chown -R www-data:www-data /var/www/html
+	sudo rm -rf ${NC_DATA_FOLDER}/core/skeleton
+	sudo mkdir -p ${NC_DATA_FOLDER}/core/skeleton
+	sudo cp hip/skeleton/* ${NC_DATA_FOLDER}/core/skeleton
+	sudo chown -R www-data:www-data ${NC_DATA_FOLDER}/core/skeleton
+	$(DC) build cron
+	sudo chown root:root nextcloud-docker/crontab
+	$(DC) up -d
+
 #status: @ Show the status of the HIP
 status:
 	@echo "\n"

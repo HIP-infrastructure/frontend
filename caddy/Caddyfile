@@ -2,27 +2,28 @@ https://{$HOSTNAME}
 
 encode gzip zstd
 
-#tls /etc/caddy/cert.pem /etc/caddy/key.pem
+log {
+	output file /var/log/nextcloud.log
+	level DEBUG
+}
 
+# gateway api
+handle /api/v1/* {
+	reverse_proxy {$GATEWAY_REVERSE_PROXY}
+}
+
+# nextcloud config
 root * /var/www/html
 file_server
-log {
-	output file     /var/log/nextcloud.log
-	format single_field common_log
-}
-php_fastcgi app:9000
+php_fastcgi /* 127.0.0.1:9000
 
 header {
-        # enable HSTS
-        Strict-Transport-Security max-age=31536000;
+	# enable HSTS
+	Strict-Transport-Security max-age=31536000;
 }
 
 redir /.well-known/carddav /remote.php/dav 301
 redir /.well-known/caldav /remote.php/dav 301
-
-handle /api/v1/* {
-	reverse_proxy {$GATEWAY_REVERSE_PROXY}
-}
 
 # ghostfs
 redir /fs /fs/

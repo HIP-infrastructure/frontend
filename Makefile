@@ -22,7 +22,7 @@ pm2:
 	sudo systemctl enable pm2-root
 
 #install: Install the latest HIP. Without GhostFS 
-install: require stop install-web build-datahipy pm2
+install: require stop install-web pm2
 
 #install-ghostfs: @ Stop, update and install GhostFS only
 install-ghostfs: require
@@ -45,6 +45,19 @@ install-nextcloud:
 	$(DC) build cron
 	sudo chown root:root nextcloud-docker/crontab
 	$(DC) up -d
+
+build-socialapp:
+	make -C nextcloud-social-login build
+
+install-socialapp:
+	[ ! -d nextcloud-social-login ] && git clone git@github.com:HIP-infrastructure/nextcloud-social-login.git || true
+	cd nextcloud-social-login && cd ..
+	sudo rm -rf $(NC_APP_FOLDER)/sociallogin
+	sudo cp -r ./nextcloud-social-login $(NC_APP_FOLDER)/sociallogin
+	sudo chown -R www-data:www-data $(NC_APP_FOLDER)/sociallogin
+
+enable-socialapp:
+	$(OCC) app:enable sociallogin
 
 #status: @ Show the status of the HIP
 status:
@@ -92,7 +105,7 @@ start:
 	sudo pm2 start pm2/ecosystem.config.js
 
 #stop: @ Stop all services (-GhostFS)
-stop: dev-stop
+stop:
 	sudo pm2 stop pm2/ecosystem.config.js
 
 install-hipapp:

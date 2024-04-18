@@ -37,6 +37,13 @@ then
     echo "gunicorn installed."
 fi
 
+if ! command -v envsubst &> /dev/null
+then
+    echo "envsubst could not be found, installing..."
+    sudo apt install -y gettext-base
+    echo "envsubst installed."
+fi
+
 if ! command -v node &> /dev/null
 then
     echo "node could not be found, installing..."
@@ -91,6 +98,8 @@ then
 	sudo npm i --location=global @nestjs/cli
     echo "nest cli installed."
 fi
+
+sudo npm install dotenv || true
 
 dpkg -l | grep libfuse2 | grep -q ii
 if [ $? -eq 1 ];

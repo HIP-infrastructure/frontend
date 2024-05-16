@@ -52,6 +52,18 @@ module.exports = {
         "LD_LIBRARY_PATH": "/home/dsr_adm/app-in-browser/libssl/out"
       },
       interpreter: 'python3' 
+    },
+    {
+      script: gunicorn,
+      args: `--workers 5 --timeout 120 --bind 127.0.0.1:3449 --pythonpath auth_backend auth_backend:app`,
+      name: 'gunicorn_auth_backend_collab',
+      cwd: relative('../ghostfs'),
+      watch: relative('../ghostfs/auth_backend'),
+      env: {
+        "LD_LIBRARY_PATH": "/home/dsr_adm/app-in-browser/libssl/out",
+        "GHOSTFS_AUTH_PORT": collab_auth_port,
+      },
+      interpreter: 'python3' 
     }
   ],
 };

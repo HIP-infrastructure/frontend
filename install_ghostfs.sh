@@ -35,11 +35,16 @@ fi
 if [ -f ./ghostfs/auth_backend/auth_backend.secret ]; then
     echo "./ghostfs/auth_backend.secret exists, not creating."
 else
-    echo -n "Enter auth_backend username: "
-    read -r auth_backend_username
-    echo -n "Enter auth_backend password: "
-    read -rs auth_backend_password
-    echo
+    if [ -z "${AUTH_BACKEND_USERNAME}" ] && [ -z "${AUTH_BACKEND_PASSWORD}" ]; then
+        echo -n "Enter auth_backend username: "
+        read -r auth_backend_username
+        echo -n "Enter auth_backend password: "
+        read -rs auth_backend_password
+        echo
+    else
+        auth_backend_username="${AUTH_BACKEND_USERNAME}"
+        auth_backend_password="${AUTH_BACKEND_PASSWORD}"
+    fi
 
     auth_backend_hash=`python3 -c "from werkzeug.security import generate_password_hash as g; print(g(\"$auth_backend_password\"), end=\"\");"`
 

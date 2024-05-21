@@ -37,6 +37,19 @@ route /fs/* {
 	}
 }
 
+redir /collab-fs /collab-fs/
+route /collab-fs/* {
+	uri strip_prefix /collab-fs
+	reverse_proxy localhost:3449 {
+		health_uri /ok
+		health_interval 10s
+
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+	}
+}
+
 # .htaccess / data / config / ... shouldn't be accessible from outside
 @forbidden {
 	path    /.htaccess

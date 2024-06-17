@@ -5,9 +5,15 @@ const { execSync } = require("child_process");
 const which = cmd => execSync(`which ${cmd}`).toString().trimEnd();
 const relative = (...dir) => path.resolve(__dirname, ...dir);
 
-const envConfig = dotenv.config({ path: relative("../.env") }).parsed || {};
+const env = dotenv.config({ path: relative("../.env") }).parsed || {};
+
 // Merge .env variables with process.env, with process.env taking precedence
-const env = { ...envConfig, ...process.env };
+const whitelist = ['REMOTE_APP_API', 'COLLAB_REMOTE_APP_API']; 
+whitelist.forEach(key => {
+  if (process.env[key]) {
+    env[key] = process.env[key];
+  }
+});
 
 const caddy = which("caddy");
 

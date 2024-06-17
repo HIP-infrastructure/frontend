@@ -5,7 +5,9 @@ const { execSync } = require("child_process");
 const which = cmd => execSync(`which ${cmd}`).toString().trimEnd();
 const relative = (...dir) => path.resolve(__dirname, ...dir);
 
-const env = dotenv.config({ path: relative("../.env") }).parsed;
+const envConfig = dotenv.config({ path: relative("../.env") }).parsed || {};
+// Merge .env variables with process.env, with process.env taking precedence
+const env = { ...envConfig, ...process.env };
 
 const caddy = which("caddy");
 

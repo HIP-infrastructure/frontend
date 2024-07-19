@@ -35,6 +35,9 @@ As the package will migrate to K8s, everything is build on the host
 - You will need to provide a user/password for the server, that you will need to install on the [backend](https://github.com/HIP-infrastructure/app-in-browser#configuring-app-in-browser))
 - pm2 cannot start ghostfs at this time, as Nextcloud data storage doesn't exist yet. A pm2 error for the service is ok at this time. 
 
+#### Post-install
+- Enable the `Group folders` app via the administration panel or occ CLI.
+
 ## Deploy, dev
 
 Change the NODE_ENV to development in the .env file

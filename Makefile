@@ -152,17 +152,6 @@ maintenance-%:
 dc:
 	$(DC) -f docker-compose-dev.yml $(c)
 
-.PHONY: configure-nextcloud
-configure-nextcloud:
-	sudo mkdir -p /var/www
-	[ ! -L /var/www/html ] && sudo ln -sf ${NC_DATA_FOLDER} /var/www/html || true
-	sudo chown -R www-data:www-data /var/www/html
-	sudo rm -rf ${NC_DATA_FOLDER}/core/skeleton
-	sudo mkdir -p ${NC_DATA_FOLDER}/core/skeleton
-	sudo cp hip/skeleton/* ${NC_DATA_FOLDER}/core/skeleton
-	sudo chown -R www-data:www-data ${NC_DATA_FOLDER}/core/skeleton
-	sudo chown root:root crontab
-
 .PHONY: occ
 #occ: @ Run occ command (make occ c="status") (make occ c="files:scan --all") etc
 occ:

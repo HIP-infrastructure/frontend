@@ -12,8 +12,8 @@
 	php_fastcgi localhost:9000
 
 	header {
-			# enable HSTS
-			Strict-Transport-Security max-age=31536000;
+		# enable HSTS
+		Strict-Transport-Security max-age=31536000;
 	}
 
 	redir /.well-known/carddav /remote.php/dav 301
@@ -31,9 +31,9 @@
 			health_uri /ok
 			health_interval 10s
 
-			header_up Host {host}
-			header_up X-Real-IP {remote_host}
-			header_up X-Forwarded-For {remote_host}
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote.host}
+			header_up X-Forwarded-For {http.request.remote.host}
 		}
 	}
 
@@ -44,9 +44,9 @@
 			health_uri /ok
 			health_interval 10s
 
-			header_up Host {host}
-			header_up X-Real-IP {remote_host}
-			header_up X-Forwarded-For {remote_host}
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote.host}
+			header_up X-Forwarded-For {http.request.remote.host}
 		}
 	}
 
@@ -66,21 +66,20 @@
 	}
 
 	respond @forbidden 404
-
 }
 
-{ 
-    if {$EXT_CADDY_KEYCLOAK_LISTEN_ENABLED} == "1" {
-        {$EXT_CADDY_KEYCLOAK_DOMAIN} {
-            route /* {
-                reverse_proxy {$KEYCLOAK_CADDY_URL:localhost:8080} {
-                    health_uri /
-                    health_interval 10s
+# Handle Keycloak routes only if enabled
+{$EXT_CADDY_KEYCLOAK_DOMAIN} {
+	@enabled {
+		expression {env.EXT_CADDY_KEYCLOAK_LISTEN_ENABLED} == "1"
+	}
+	route /* {
+		reverse_proxy {$KEYCLOAK_CADDY_URL:localhost:8080} {
+			health_uri /
+			health_interval 10s
 
-                    header_up Host {host}
-                    header_up X-Real-IP {remote_host}
-                }
-            }
-        }
-    }
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote.host}
+		}
+	}
 }

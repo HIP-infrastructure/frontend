@@ -83,3 +83,19 @@
 		}
 	}
 }
+
+# Handle Keycloak routes only if enabled
+{$EXT_CADDY_APP_IN_BROWSER_DOMAIN} {
+	@enabled {
+		expression {env.EXT_CADDY_APP_IN_BROWSER_LISTEN_ENABLED} == "1"
+	}
+	route /* {
+		reverse_proxy http://hip.local:9001 {
+			health_uri /api/ok
+			health_interval 10s
+
+			header_up Host {http.request.host}
+			header_up X-Real-IP {http.request.remote.host}
+		}
+	}
+}

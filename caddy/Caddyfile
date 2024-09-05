@@ -1,4 +1,4 @@
-{$EXT_CADDY_BASE_DOMAIN} {
+{$EXT_CADDY_BASE_DOMAIN} http://hip.local {
 
 	encode gzip zstd
 

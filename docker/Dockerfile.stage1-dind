@@ -1,0 +1,17 @@
+FROM cruizba/ubuntu-dind
+
+USER root
+
+RUN apt-get update  && \
+    apt install -y sudo
+
+RUN apt install -y git
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN git config --global --add safe.directory '*'
+
+COPY --chmod=0755 hip-required_ubuntu-22.04.sh .
+RUN ./hip-required_ubuntu-22.04.sh
+
+COPY . .

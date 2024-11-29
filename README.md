@@ -130,18 +130,14 @@ deploy/reload gateway
 Quick summary for make (after install)
 
 ```
-install                        * USE THIS ONE * Stop, update, build and install the latest HIP, without GhostFS 
 install-ghostfs                Stop, update and install GhostFS only
 status                         Show the status of the HIP
-install-web                    Build & install only the gateway, bids-tools and the webapp
+install-web                    Build & install the webapp and the gateway
 start                          Start all services (-GhostFS)
 stop                           Stop all services (-GhostFS)
 maintenance                    Enable/disable maintenance mode (make maintenance-on/maintenance-off)
-nextcloud-repair               Attempt to repair NextCloud
-nextcloud-upgrade              Upgrade NextCloud
-nextcloud-dump                 Dump the current NextCloud DB (Postgres)
-dev-update                     Pull and update git submodules to a given branch eg. dev-update branch=dev
-dev-install                    Install dev stack for frontend & gateway, use dev-update branch=dev to switch branch, you should have NODE_ENV=development
+dc                             Run docker-compose (make dc c="ps")
+dev-install                    Install dev stack for frontend & gateway, use update branch=dev to switch branch, you should have NODE_ENV=development
 dev-install-gateway            Restart the dev gateway
 help                           List available tasks on this project
 ```

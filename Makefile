@@ -7,7 +7,7 @@ export
 .DEFAULT_GOAL := help
 
 DC=docker compose --env-file ./.env -f docker-compose.yml
-OCC=docker compose exec --user www-data cron php occ
+OCC=docker exec --user www-data cron php occ
 
 .PHONY: require
 require:
@@ -25,7 +25,7 @@ pm2:
 
 .PHONY: install
 #install: Install the latest HIP. Without GhostFS 
-install: require stop install-nextcloud install-web install-socialapp build-datahipy nextcloud-config pm2
+install: require stop install-web build-datahipy pm2
 
 .PHONY: install-ghostfs
 #install-ghostfs: @ Stop, update and install GhostFS only
@@ -34,7 +34,6 @@ install-ghostfs: require
 	echo "AUTH_BACKEND_DOMAIN=${REMOTE_APP_API}" > ghostfs/auth_backend/auth_backend.env
 	sudo pm2 stop pm2/ecosystem.ghostfs.config.js
 	bash ./install_ghostfs.sh
-	$(DC) restart cron
 	sudo pm2 start pm2/ecosystem.ghostfs.config.js
 	sudo pm2 save
 
@@ -72,6 +71,7 @@ build-datahipy:
 
 .PHONY: build-web
 build-web:
+	$(DC) up -d
 	cp .env gateway/.env
 	make -C gateway build
 	make -C hip build
@@ -85,13 +85,14 @@ install-web: maintenance-on build-web install-hipapp maintenance-off
 
 .PHONY: build-ui
 build-ui:
-	sudo make -C hip build
+	make -C hip build
 
 .PHONY: install-ui
 install-ui: build-ui install-hipapp
 
 .PHONY: install-gateway
 install-gateway:
+	$(DC) up -d
 	cp .env gateway/.env
 	sudo make -C gateway build
 	sudo pm2 restart gateway || true
@@ -181,12 +182,15 @@ nextcloud-config:
 	$(OCC) app:enable groupfolders
 	$(OCC) app:enable bruteforcesettings
 	$(OCC) app:enable richdocumentscode
+	$(OCC) app:enable sharingpath
 	$(OCC) app:disable dashboard
 	$(OCC) app:disable photos
 	$(OCC) app:disable activity
 	$(OCC) app:disable forms
 	$(OCC) app:disable spreed
 	$(OCC) app:disable user_status
+	
+## Utils
 
 .PHONY: nextcloud-create-groups
 nextcloud-create-groups:
@@ -213,7 +217,7 @@ dev-build: build-datahipy
 
 .PHONY: dev-install
 #dev-install: @ Install dev stack for frontend & gateway, use update branch=dev to switch branch, you should have NODE_ENV=development
-dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 nextcloud-config dev-hipapp dev-socialapp
+dev-install: stop dev-stop dev-stop-gateway dev-build dev-up sleep-5 dev-hipapp
 	sudo pm2 start pm2/ecosystem.dev.config.js
 	[ -f ../app-in-browser/scripts/installbackend.sh ] && (cd ../app-in-browser; ./scripts/installbackend.sh && cd ../frontend) || true
 	cp .env gateway/.env

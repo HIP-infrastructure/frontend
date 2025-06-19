@@ -5,3 +5,5 @@ package-lock.json
 package.json
 node_modules
 .mode
+nextcloud-docker/
+nextcloud-social-login/

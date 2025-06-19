@@ -18,7 +18,7 @@ module.exports = {
   apps: [
     {
       script: caddy,
-      args: 'run --config ../caddy/Caddyfile.dev',
+      args: 'run --config ../caddy/Caddyfile.dev --adapter caddyfile',
       name: 'caddy_frontend',
       cwd: relative('../caddy'),
       watch: relative('../caddy'),

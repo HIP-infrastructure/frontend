@@ -1,5 +1,4 @@
-version: "3.7"
-
+---
 services:
   hip:
     container_name: hip
@@ -22,6 +21,3 @@ services:
     ports:
       - 3000:3000
     command: npm run start
-    networks:
-      - frontend
-
